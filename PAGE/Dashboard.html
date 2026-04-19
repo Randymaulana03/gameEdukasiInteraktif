@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard Level - Game Edukasi</title>
+	<style>
+		:root {
+			--pink: #ec9cab;
+			--green: #5db824;
+			--blue: #20b8f0;
+			--red: #ff0055;
+			--shadow: rgba(0, 0, 0, 0.25);
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+			background-image: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.2)), url("../IMAGE/BG_Level.png");
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			overflow: hidden;
+			animation: bgEnter 1s ease-out;
+		}
+
+		.overlay {
+			min-height: 100vh;
+			display: grid;
+			place-items: center;
+			padding: 24px;
+		}
+
+		.level-menu {
+			width: min(500px, 92vw);
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+			align-items: center;
+		}
+
+		.sun-rays {
+			width: 160px;
+			height: 45px;
+			margin-bottom: -6px;
+			opacity: 0;
+			transform: translateY(20px);
+			animation: popUp 0.6s ease-out forwards;
+			animation-delay: 0.15s;
+		}
+
+		.sun-rays span {
+			display: inline-block;
+			width: 38px;
+			height: 12px;
+			margin: 0 4px;
+			border-radius: 12px;
+			background: #f39498;
+			transform-origin: center bottom;
+		}
+
+		.sun-rays span:nth-child(1) { transform: rotate(-20deg) translateY(6px); }
+		.sun-rays span:nth-child(2) { transform: rotate(-5deg) translateY(-2px); }
+		.sun-rays span:nth-child(3) { transform: rotate(10deg) translateY(-2px); }
+		.sun-rays span:nth-child(4) { transform: rotate(23deg) translateY(6px); }
+
+		.level-btn {
+			width: 100%;
+			max-width: 370px;
+			border: none;
+			border-radius: 50px;
+			padding: 20px 24px;
+			background: var(--pink);
+			box-shadow: 0 8px 0 rgba(200, 110, 126, 0.95), 0 14px 24px var(--shadow);
+			cursor: pointer;
+			text-transform: uppercase;
+			font-weight: 900;
+			letter-spacing: 2px;
+			font-size: clamp(2rem, 4.5vw, 3rem);
+			line-height: 1;
+			transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+			opacity: 0;
+			transform: translateY(28px) scale(0.95);
+			animation: popUp 0.6s ease-out forwards;
+			touch-action: manipulation;
+		}
+
+		.level-btn:hover {
+			filter: brightness(1.03);
+			transform: translateY(-2px) scale(1.01);
+			box-shadow: 0 10px 0 rgba(200, 110, 126, 0.95), 0 18px 24px var(--shadow);
+		}
+
+		.level-btn:active,
+		.level-btn.pressed {
+			transform: translateY(6px) scale(0.98);
+			box-shadow: 0 2px 0 rgba(200, 110, 126, 0.95), 0 8px 16px rgba(0, 0, 0, 0.22);
+			filter: saturate(1.1);
+		}
+
+		.level-1 { color: var(--green); animation-delay: 0.3s; }
+		.level-2 { color: var(--blue); animation-delay: 0.45s; }
+		.level-3 { color: var(--red); animation-delay: 0.6s; }
+
+		@keyframes popUp {
+			from {
+				opacity: 0;
+				transform: translateY(28px) scale(0.95);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		@keyframes bgEnter {
+			from {
+				filter: blur(3px) saturate(0.9);
+				transform: scale(1.02);
+			}
+			to {
+				filter: blur(0) saturate(1);
+				transform: scale(1);
+			}
+		}
+
+		@media (max-width: 600px) {
+			.level-menu {
+				gap: 16px;
+			}
+
+			.level-btn {
+				padding: 16px 18px;
+			}
+
+			.sun-rays {
+				transform: scale(0.88);
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="overlay">
+		<section class="level-menu" aria-label="Pilih level permainan">
+			<div class="sun-rays" aria-hidden="true">
+				<span></span><span></span><span></span><span></span>
+			</div>
+
+			<button class="level-btn level-1" data-target="Level1.html">LEVEL 1</button>
+			<button class="level-btn level-2" data-target="Level2.html">LEVEL 2</button>
+			<button class="level-btn level-3" data-target="Level3.html">LEVEL 3</button>
+		</section>
+	</main>
+
+	<script>
+		const buttons = document.querySelectorAll('.level-btn');
+
+		buttons.forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const targetPage = btn.dataset.target;
+				btn.classList.add('pressed');
+
+				// Delay singkat supaya animasi tombol terlihat sebelum pindah halaman.
+				setTimeout(() => {
+					window.location.href = targetPage;
+				}, 220);
+			});
+		});
+	</script>
+</body>
+</html>
