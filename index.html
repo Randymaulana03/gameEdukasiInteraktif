@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+
+    <!-- Howler.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+</head>
+<body>
+    <!-- Test buttons sound -->
+    <button onclick="testSound('A')">Play A</button>
+    <button onclick="testSound('B')">Play B</button>
+
+    <!-- Test word validation -->
+    <button onclick="testWord('CAT')">Test CAT</button>
+    <button onclick="testWord('CAR')">Test CAR</button>
+
+    <!-- Test word building from letters -->
+    <button onclick="addLetter('C')">C</button>
+    <button onclick="addLetter('A')">A</button>
+    <button onclick="addLetter('T')">T</button>
+
+    <br><br>
+
+    <!-- <button onclick="submitWord()">Submit</button> -->
+    <button onclick="resetWord()">Reset</button>
+
+   <!-- Test arrange (drag simulation) -->
+    <button onclick="setInitialLetters(['T','C','A'])">Init TCA</button>
+
+    <br><br>
+
+    <button onclick="updateArrangement(['C','A','T'])">
+    Simulasi Jadi CAT
+    </button>
+
+
+    <!-- HARUS module -->
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>
