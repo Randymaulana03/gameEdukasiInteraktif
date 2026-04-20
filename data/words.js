@@ -2,5 +2,6 @@ export const words = [
   "CAT",
   "DOG",
   "BIRD",
-  "APPLE"
+  "APPLE",
+  "ATAP"
 ];

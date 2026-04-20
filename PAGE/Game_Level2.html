@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Level 2 - Word Builder (Drag)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <style>
+        :root {
+            --panel: rgba(255, 255, 255, 0.4);
+            --panel-border: rgba(255, 255, 255, 0.65);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.18)), url("../IMAGE/BG_level1.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            width: min(1200px, 100%);
+            background: var(--panel);
+            border: 2px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 24px;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.7s ease-out;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .game-header h1 {
+            font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+            color: #8b1010;
+            background: rgba(255, 255, 255, 0.66);
+            padding: 12px 20px;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+        .game-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(80px, 1fr));
+            gap: 12px;
+        }
+
+        .letter {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #E8A84C 0%, #D4924A 100%);
+            color: #8b1010;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            cursor: pointer;
+        
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .letter:hover {
+            transform: scale(1.08);
+            filter: brightness(1.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .letter.active {
+            background: linear-gradient(135deg, #FF6B9D 0%, #FFC75F 100%);
+            transform: scale(1.15);
+            box-shadow: 0 10px 25px rgba(255, 107, 157, 0.3);
+        }
+
+        .letter.correct {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099FF 100%);
+            animation: correctPulse 0.6s ease-out;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1.15); }
+            50% { transform: scale(1.22); }
+            100% { transform: scale(1.15); }
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 380px;
+            backdrop-filter: blur(3px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .target-image {
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 1 / 1;
+            background: rgba(200, 150, 100, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .target-word {
+            display: none;
+        }
+
+        .current-word {
+            font-size: clamp(2.4rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #1d3f19;
+            text-align: center;
+            background: rgba(240, 255, 240, 0.9);
+            padding: 24px 36px;
+            border-radius: 16px;
+            min-width: 220px;
+            letter-spacing: 3px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: bold;
+            min-height: 30px;
+            margin-top: 12px;
+        }
+
+        .feedback.correct {
+            color: #00aa00;
+        }
+
+        .feedback.incorrect {
+            color: #cc0000;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: clamp(0.9rem, 1.8vw, 1rem);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            color: #5c3900;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #nextBtn {
+            display: none;
+            background: rgba(100, 200, 255, 0.9);
+            color: white;
+        }
+
+        #nextBtn.show {
+            display: inline-block;
+        }
+
+        #lineCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        canvas.show {
+            z-index: 10;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== NOTIFICATION MODAL ===== */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .notification-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            min-width: 300px;
+            max-width: 500px;
+            animation: notificationSlide 0.5s ease-out;
+        }
+
+        .notification-box.correct {
+            border: 5px solid #00D4FF;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 255, 0.1));
+        }
+
+        .notification-box.incorrect {
+            border: 5px solid #FF6B6B;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(238, 90, 111, 0.1));
+        }
+
+        .notification-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .notification-text {
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            font-weight: 900;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        .notification-box.correct .notification-text {
+            color: #00aa00;
+        }
+
+        .notification-box.incorrect .notification-text {
+            color: #cc0000;
+        }
+
+        @keyframes notificationSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .game-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            #grid {
+                grid-template-columns: repeat(3, minmax(70px, 1fr));
+            }
+
+            .right-panel {
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="lineCanvas"></canvas>
+
+    <main class="game-container">
+        <div class="game-header">
+            <h1>Level 2 - Susun Kata</h1>
+            <div id="questionInfo" style="margin-top: 8px; font-weight: 800; color: #8b1010;"></div>
+        </div>
+
+        <div class="game-content">
+            <div class="left-panel">
+                <div id="grid"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="right-panel">
+                <div class="target-image">
+                    <img id="targetImage" src="../IMAGE/atap.jpg" alt="Atap" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="current-word" id="currentWord">_</div>
+                <div class="controls">
+                    <button id="resetBtn">🔄 Reset</button>
+                    <button id="nextBtn">✅ Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== NOTIFICATION OVERLAY ===== -->
+    <div class="notification-overlay" id="notificationOverlay">
+        <div class="notification-box" id="notificationBox">
+            <div class="notification-icon" id="notificationIcon">✅</div>
+            <div class="notification-text" id="notificationText">BENAR!</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { wordsLevel2 as QUESTION_BANK, buildLevel2Matrix } from '../data/words_Level2.js';
+
+        let isDragging = false;
+        let selected = [];
+        let selectedEls = [];
+        let lastEl = null;
+        let isWordCorrect = false;
+        let currentQuestionId = 1;
+        let currentMatrix = [];
+        let currentGridCols = 4;
+
+        const grid = document.getElementById('grid');
+        const canvas = document.getElementById('lineCanvas');
+        const ctx = canvas.getContext('2d');
+        const currentWordDisplay = document.getElementById('currentWord');
+        const targetImage = document.getElementById('targetImage');
+        const questionInfo = document.getElementById('questionInfo');
+        const resetBtn = document.getElementById('resetBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const feedback = document.getElementById('feedback');
+        
+        // ===== NOTIFICATION ELEMENTS =====
+        const notificationOverlay = document.getElementById('notificationOverlay');
+        const notificationBox = document.getElementById('notificationBox');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationText = document.getElementById('notificationText');
+
+        // ===== SHOW NOTIFICATION FUNCTION =====
+        function showNotification(isCorrect) {
+            if (isCorrect) {
+                notificationBox.className = 'notification-box correct';
+                notificationIcon.textContent = '✅';
+                notificationText.textContent = 'BENAR!';
+                playAudio('../assets/audio/Benar.mp3.mpeg');
+            } else {
+                notificationBox.className = 'notification-box incorrect';
+                notificationIcon.textContent = '❌';
+                notificationText.textContent = 'COBA LAGI!';
+                playAudio('../assets/audio/Salah.mp3.mpeg');
+            }
+
+            notificationOverlay.classList.add('show');
+
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notificationOverlay.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== PLAY AUDIO FUNCTION =====
+        function playAudio(audioPath) {
+            try {
+                const audio = new Audio(audioPath);
+                audio.play().catch(err => console.log('Audio play error:', err));
+            } catch (error) {
+                console.log('Audio error:', error);
+            }
+        }
+
+        // ===== SETUP CANVAS =====
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function createLetterButton(letter) {
+            const el = document.createElement('button');
+            el.className = 'letter';
+            el.dataset.letter = letter;
+            el.textContent = letter;
+            el.type = 'button';
+            attachLetterHandlers(el);
+            return el;
+        }
+
+        function getQuestionById(id) {
+            return QUESTION_BANK.find(q => q.id === id);
+        }
+
+        function flattenMatrix(matrix) {
+            return matrix.flat();
+        }
+
+        function regenerateCurrentMatrix() {
+            const q = getCurrentQuestion();
+            const { matrix } = buildLevel2Matrix(q.answer, q.grid);
+            currentMatrix = matrix;
+            currentGridCols = q.grid?.cols || 4;
+        }
+
+        function renderGridForQuestion() {
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${currentGridCols}, minmax(60px, 1fr))`;
+            const layout = flattenMatrix(currentMatrix);
+            layout.forEach(letter => {
+                grid.appendChild(createLetterButton(letter));
+            });
+        }
+
+        function getCurrentQuestion() {
+            return getQuestionById(currentQuestionId);
+        }
+
+        function getNextQuestionId() {
+            const sortedIds = QUESTION_BANK.map(q => q.id).sort((a, b) => a - b);
+            return sortedIds.find(id => id > currentQuestionId);
+        }
+
+        function resetRoundState() {
+            isDragging = false;
+            selected = [];
+            selectedEls = [];
+            lastEl = null;
+            isWordCorrect = false;
+
+            document.querySelectorAll('.letter').forEach(el => {
+                el.classList.remove('active', 'correct');
+            });
+
+            clearCanvas();
+            canvas.classList.remove('show');
+            updateDisplay();
+            nextBtn.classList.remove('show');
+            clearFeedback();
+        }
+
+        function loadQuestionById(id) {
+            currentQuestionId = id;
+            const q = getCurrentQuestion();
+            targetImage.src = q.image;
+            targetImage.alt = q.label;
+            questionInfo.textContent = `ID ${q.id} - ${q.label.toUpperCase()}`;
+            nextBtn.textContent = getNextQuestionId() ? '➡️ Soal Berikutnya' : '✅ Level 3';
+            regenerateCurrentMatrix();
+            renderGridForQuestion();
+            resetRoundState();
+        }
+
+        // ===== SIMPLE CHECK WORD FUNCTION =====
+        function checkWord(word) {
+            const upperWord = word.toUpperCase().trim();
+            const isValid = upperWord === getCurrentQuestion().answer;
+            console.log('[checkWord]', word, '→', upperWord, '| target:', getCurrentQuestion().answer, '=', isValid);
+            return isValid;
+        }
+
+        function attachLetterHandlers(el) {
+            const letter = el.dataset.letter;
+
+            // 🟢 START DRAG
+            el.addEventListener('mousedown', () => {
+                isDragging = true;
+                selected = [letter];
+                selectedEls = [el];
+                lastEl = el;
+                isWordCorrect = false;
+
+                el.classList.add('active');
+                canvas.classList.add('show');
+
+                updateDisplay();
+                clearFeedback();
+                
+                console.log('[START] Letter:', letter);
+            });
+
+            // 🟡 DRAG ENTER (mouseenter)
+            el.addEventListener('mouseenter', () => {
+                if (!isDragging) return;
+
+                // Cegah input huruf yang BERURUTAN (consecutive) saja
+                if (lastEl && lastEl.dataset.letter === letter) return;
+
+                selected.push(letter);
+                selectedEls.push(el);
+                
+                const currentWord = selected.join('');
+                console.log('[DRAG] Added:', letter, '→ Word:', currentWord);
+
+                // Draw line dari huruf sebelumnya ke huruf sekarang
+                if (lastEl) {
+                    drawLine(lastEl, el);
+                }
+
+                el.classList.add('active');
+                lastEl = el;
+
+                // Update display
+                updateDisplay();
+
+                // Check apakah benar
+                const isCorrect = checkWord(currentWord);
+
+                if (isCorrect) {
+                    isWordCorrect = true;
+                    el.classList.add('correct');
+                    feedback.textContent = '✅ Benar!';
+                    feedback.className = 'feedback correct';
+                    console.log('✅ CORRECT WORD!');
+                    showNotification(true);
+                }
+            });
+        }
+
+        // 🔴 END DRAG
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+
+            isDragging = false;
+            canvas.classList.remove('show');
+
+            const finalWord = selected.join('');
+            console.log('[MOUSEUP] Word:', finalWord, 'IsCorrect:', isWordCorrect);
+
+            // Hapus highlight
+            document.querySelectorAll('.letter').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Jika benar, keep highlight correct & show next button
+            if (isWordCorrect) {
+                selectedEls.forEach(el => {
+                    el.classList.add('correct');
+                });
+                nextBtn.classList.add('show');
+            } else {
+                // Jika salah, clear
+                selected = [];
+                selectedEls = [];
+                lastEl = null;
+                clearCanvas();
+                updateDisplay();
+                feedback.textContent = '❌ Coba lagi';
+                feedback.className = 'feedback incorrect';
+                showNotification(false);
+            }
+        });
+
+        // ===== UTILITIES =====
+        function drawLine(fromEl, toEl) {
+            const r1 = fromEl.getBoundingClientRect();
+            const r2 = toEl.getBoundingClientRect();
+
+            const x1 = r1.left + r1.width / 2;
+            const y1 = r1.top + r1.height / 2;
+            const x2 = r2.left + r2.width / 2;
+            const y2 = r2.top + r2.height / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateDisplay() {
+            const word = selected.join('');
+            currentWordDisplay.textContent = word || '_';
+        }
+
+        function clearFeedback() {
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+        }
+
+        // ===== RESET BUTTON =====
+        resetBtn.addEventListener('click', () => {
+            regenerateCurrentMatrix();
+            resetRoundState();
+            renderGridForQuestion();
+        });
+
+        // ===== NEXT BUTTON =====
+        nextBtn.addEventListener('click', () => {
+            const nextId = getNextQuestionId();
+            if (nextId) {
+                loadQuestionById(nextId);
+                return;
+            }
+
+            window.location.href = 'Level3.html';
+        });
+
+        loadQuestionById(1);
+    </script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Game Level 3 - Rapikan Huruf</title>
+	<style>
+		:root {
+			--panel: rgba(255, 255, 255, 0.42);
+			--panel-border: rgba(255, 255, 255, 0.72);
+			--tile-base: #f3c24c;
+			--tile-text: #7f1c0f;
+			--ok: #00a34c;
+			--bad: #c50037;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+			background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.2)), url("../IMAGE/BG_level1.png");
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 20px;
+		}
+
+		.game-shell {
+			width: min(1100px, 100%);
+			background: var(--panel);
+			border: 2px solid var(--panel-border);
+			border-radius: 28px;
+			padding: 24px;
+			backdrop-filter: blur(4px);
+			box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+			animation: popIn 0.6s ease-out;
+		}
+
+		.header {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+
+		.header h1 {
+			font-size: clamp(1.6rem, 3vw, 2.4rem);
+			color: #8b1010;
+			background: rgba(255, 255, 255, 0.68);
+			padding: 10px 18px;
+			border-radius: 999px;
+			display: inline-block;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 24px;
+			align-items: stretch;
+		}
+
+		.left,
+		.right {
+			border-radius: 20px;
+			background: rgba(255, 255, 255, 0.16);
+			border: 2px solid rgba(255, 255, 255, 0.35);
+			padding: 18px;
+			display: flex;
+			flex-direction: column;
+			gap: 14px;
+		}
+
+		.hint {
+			text-align: center;
+			color: #6b2b00;
+			font-weight: 700;
+			font-size: clamp(1rem, 2vw, 1.2rem);
+		}
+
+		.target-image {
+			width: 100%;
+			max-width: 320px;
+			aspect-ratio: 1 / 1;
+			margin: 0 auto;
+			border-radius: 16px;
+			overflow: hidden;
+			border: 3px solid rgba(255, 255, 255, 0.9);
+			box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+			background: rgba(255, 255, 255, 0.3);
+		}
+
+		.target-image img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
+
+		.answer {
+			min-height: 90px;
+			border-radius: 16px;
+			border: 2px dashed rgba(139, 16, 16, 0.6);
+			background: rgba(255, 255, 255, 0.6);
+			padding: 12px;
+			display: grid;
+			grid-template-columns: repeat(4, minmax(56px, 1fr));
+			gap: 10px;
+			align-items: center;
+		}
+
+		.slot {
+			aspect-ratio: 1;
+			border-radius: 12px;
+			border: 2px solid rgba(139, 16, 16, 0.25);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: clamp(1.5rem, 4vw, 2rem);
+			font-weight: 900;
+			color: #8b1010;
+			background: rgba(255, 255, 255, 0.7);
+		}
+
+		.letters {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(60px, 1fr));
+			gap: 10px;
+		}
+
+		.letter-btn {
+			border: none;
+			border-radius: 14px;
+			background: linear-gradient(135deg, var(--tile-base), #d89342);
+			color: var(--tile-text);
+			font-weight: 900;
+			font-size: clamp(1.4rem, 3vw, 2rem);
+			aspect-ratio: 1;
+			cursor: pointer;
+			box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+			transition: transform 0.15s ease, filter 0.15s ease;
+		}
+
+		.letter-btn:hover {
+			transform: translateY(-2px) scale(1.03);
+			filter: brightness(1.06);
+		}
+
+		.letter-btn.used {
+			opacity: 0.42;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.feedback {
+			min-height: 30px;
+			text-align: center;
+			font-size: clamp(1rem, 2vw, 1.3rem);
+			font-weight: 800;
+		}
+
+		.feedback.ok {
+			color: var(--ok);
+		}
+
+		.feedback.bad {
+			color: var(--bad);
+		}
+
+		.controls {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			justify-content: center;
+		}
+
+		.btn {
+			border: none;
+			border-radius: 12px;
+			padding: 11px 16px;
+			font-weight: 800;
+			cursor: pointer;
+			background: rgba(255, 255, 255, 0.84);
+			color: #64390c;
+			transition: transform 0.15s ease, filter 0.15s ease;
+		}
+
+		.btn-large {
+			padding: 16px 26px;
+			font-size: 1.05rem;
+		}
+
+		.btn:hover {
+			transform: translateY(-1px);
+			filter: brightness(1.04);
+		}
+
+		.btn-next {
+			display: none;
+			background: rgba(90, 190, 120, 0.95);
+			color: #fff;
+		}
+
+		.btn-next.show {
+			display: inline-block;
+		}
+
+		.notification-overlay {
+			position: fixed;
+			inset: 0;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			background: rgba(0, 0, 0, 0.5);
+			z-index: 1000;
+			opacity: 0;
+			transition: opacity 0.25s ease;
+		}
+
+		.notification-overlay.show {
+			display: flex;
+			opacity: 1;
+		}
+
+		.notification-box {
+			width: min(460px, 90vw);
+			border-radius: 24px;
+			padding: 28px 22px;
+			text-align: center;
+			border: 4px solid transparent;
+			box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+			animation: notifyPop 0.38s ease-out;
+		}
+
+		.notification-box.correct {
+			border-color: #0cb76a;
+			background: linear-gradient(150deg, #effff6 0%, #cbf8e1 100%);
+		}
+
+		.notification-box.incorrect {
+			border-color: #ff5c77;
+			background: linear-gradient(150deg, #fff1f4 0%, #ffd6de 100%);
+		}
+
+		.notification-icon {
+			font-size: clamp(2.2rem, 6vw, 3.1rem);
+			margin-bottom: 8px;
+		}
+
+		.notification-text {
+			font-size: clamp(1.3rem, 3.8vw, 2rem);
+			font-weight: 900;
+			letter-spacing: 0.6px;
+		}
+
+		.notification-subtext {
+			margin-top: 8px;
+			font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+			font-weight: 700;
+			color: #6b2b00;
+		}
+
+		.notification-box.correct .notification-text {
+			color: #0a944f;
+		}
+
+		.notification-box.incorrect .notification-text {
+			color: #c50037;
+		}
+
+		@keyframes popIn {
+			from {
+				opacity: 0;
+				transform: scale(0.97) translateY(14px);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
+
+		@keyframes notifyPop {
+			from {
+				opacity: 0;
+				transform: scale(0.88) translateY(-16px);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
+
+		@media (max-width: 900px) {
+			.layout {
+				grid-template-columns: 1fr;
+			}
+
+			.letters,
+			.answer {
+				grid-template-columns: repeat(4, minmax(52px, 1fr));
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="game-shell">
+		<header class="header">
+			<h1>Level 3 - Rapikan Huruf</h1>
+		</header>
+
+		<section class="layout">
+			<div class="left">
+				<p class="hint">Klik huruf acak sampai membentuk nama gambar</p>
+				<div class="target-image">
+					<img src="../IMAGE/apel.jpg" alt="Gambar apel">
+				</div>
+			</div>
+
+			<div class="right">
+				<div class="answer" id="answerSlots">
+					<div class="slot">_</div>
+					<div class="slot">_</div>
+					<div class="slot">_</div>
+					<div class="slot">_</div>
+				</div>
+
+				<div class="letters" id="lettersContainer"></div>
+				<div class="feedback" id="feedback"></div>
+
+				<div class="controls">
+					<button class="btn btn-large" id="undoBtn" type="button">↩ Hapus 1</button>
+					<button class="btn btn-large" id="resetBtn" type="button">🔄 Reset</button>
+					<button class="btn btn-next" id="nextBtn" type="button">✅ Lanjut</button>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div class="notification-overlay" id="notificationOverlay">
+		<div class="notification-box" id="notificationBox">
+			<div class="notification-icon" id="notificationIcon">✅</div>
+			<div class="notification-text" id="notificationText">BENAR!</div>
+			<div class="notification-subtext" id="notificationSubtext">Kata kamu sudah tepat</div>
+		</div>
+	</div>
+
+	<script type="module">
+		import { wordsLevel3 as QUESTION_BANK, buildLevel3Letters } from '../data/Word_Level3.js';
+
+		const lettersContainer = document.getElementById('lettersContainer');
+		const answerSlots = document.getElementById('answerSlots');
+		const feedback = document.getElementById('feedback');
+		const undoBtn = document.getElementById('undoBtn');
+		const resetBtn = document.getElementById('resetBtn');
+		const nextBtn = document.getElementById('nextBtn');
+		const targetImage = document.querySelector('.target-image img');
+		const questionInfo = document.createElement('div');
+		questionInfo.id = 'questionInfo';
+		questionInfo.style.marginTop = '8px';
+		questionInfo.style.fontWeight = '800';
+		questionInfo.style.color = '#8b1010';
+		document.querySelector('.header').appendChild(questionInfo);
+		const notificationOverlay = document.getElementById('notificationOverlay');
+		const notificationBox = document.getElementById('notificationBox');
+		const notificationIcon = document.getElementById('notificationIcon');
+		const notificationText = document.getElementById('notificationText');
+		const notificationSubtext = document.getElementById('notificationSubtext');
+
+		let pool = [];
+		let answer = [];
+		let notificationTimer = null;
+		let currentQuestionId = 1;
+
+		function getQuestionById(id) {
+			return QUESTION_BANK.find(question => question.id === id);
+		}
+
+		function getCurrentQuestion() {
+			return getQuestionById(currentQuestionId);
+		}
+
+		function getNextQuestionId() {
+			const sortedIds = QUESTION_BANK.map(question => question.id).sort((a, b) => a - b);
+			return sortedIds.find(id => id > currentQuestionId);
+		}
+
+		function playAudioCandidates(candidates, index = 0) {
+			if (index >= candidates.length) {
+				return;
+			}
+
+			const audio = new Audio(candidates[index]);
+			audio.addEventListener('error', () => {
+				playAudioCandidates(candidates, index + 1);
+			}, { once: true });
+
+			audio.play().catch(() => {
+				playAudioCandidates(candidates, index + 1);
+			});
+		}
+
+		function showNotification(isCorrect) {
+			if (isCorrect) {
+				notificationBox.className = 'notification-box correct';
+				notificationIcon.textContent = '✅';
+				notificationText.textContent = 'BENAR!';
+				notificationSubtext.textContent = 'Kata yang kamu susun sudah tepat.';
+				playAudioCandidates([
+					'../assets/audio/benar.mp3',
+					'../assets/audio/Benar.mp3.mpeg'
+				]);
+			} else {
+				notificationBox.className = 'notification-box incorrect';
+				notificationIcon.textContent = '❌';
+				notificationText.textContent = 'COBA LAGI!';
+				notificationSubtext.textContent = 'Urutan huruf masih belum sesuai.';
+				playAudioCandidates([
+					'../assets/audio/salah.mp3',
+					'../assets/audio/Salah.mp3.mpeg'
+				]);
+			}
+
+			notificationOverlay.classList.add('show');
+
+			if (notificationTimer) {
+				clearTimeout(notificationTimer);
+			}
+
+			notificationTimer = setTimeout(() => {
+				notificationOverlay.classList.remove('show');
+			}, 3000);
+		}
+
+		function renderQuestion() {
+			const question = getCurrentQuestion();
+			targetImage.src = question.image;
+			targetImage.alt = question.label;
+			questionInfo.textContent = `ID ${question.id} - ${question.label.toUpperCase()}`;
+			nextBtn.textContent = getNextQuestionId() ? '➡️ Soal Berikutnya' : '✅ Selesai';
+			answerSlots.innerHTML = '';
+			for (let i = 0; i < question.answer.length; i += 1) {
+				const slot = document.createElement('div');
+				slot.className = 'slot';
+				slot.textContent = '_';
+				answerSlots.appendChild(slot);
+			}
+			pool = buildLevel3Letters(question.answer).map(letter => ({ letter, used: false }));
+			answer = [];
+			renderLetters();
+			renderSlots();
+			clearFeedback();
+			nextBtn.classList.remove('show');
+		}
+
+		function renderSlots() {
+			answerSlots.innerHTML = '';
+			for (let i = 0; i < getCurrentQuestion().answer.length; i += 1) {
+				const slot = document.createElement('div');
+				slot.className = 'slot';
+				slot.textContent = answer[i] || '_';
+				answerSlots.appendChild(slot);
+			}
+		}
+
+		function renderLetters() {
+			lettersContainer.innerHTML = '';
+			pool.forEach((item, idx) => {
+				const btn = document.createElement('button');
+				btn.className = `letter-btn${item.used ? ' used' : ''}`;
+				btn.type = 'button';
+				btn.textContent = item.letter;
+				btn.disabled = item.used;
+				btn.addEventListener('click', () => addLetter(idx));
+				lettersContainer.appendChild(btn);
+			});
+		}
+
+		function showFeedback(text, kind) {
+			feedback.textContent = text;
+			feedback.className = `feedback ${kind}`;
+		}
+
+		function clearFeedback() {
+			feedback.textContent = '';
+			feedback.className = 'feedback';
+		}
+
+		function checkAnswer() {
+			const question = getCurrentQuestion();
+			if (answer.length < question.answer.length) {
+				return;
+			}
+
+			if (answer.join('') === question.answer) {
+				showFeedback(`✅ Benar! Kata yang kamu susun: ${question.answer}`, 'ok');
+				showNotification(true);
+				nextBtn.classList.add('show');
+			} else {
+				showFeedback('❌ Urutan huruf belum tepat, coba lagi.', 'bad');
+				showNotification(false);
+				nextBtn.classList.remove('show');
+			}
+		}
+
+		function addLetter(index) {
+			if (pool[index].used || answer.length >= getCurrentQuestion().answer.length) {
+				return;
+			}
+
+			pool[index].used = true;
+			answer.push(pool[index].letter);
+			renderLetters();
+			renderSlots();
+			clearFeedback();
+			checkAnswer();
+		}
+
+		function undoLetter() {
+			if (answer.length === 0) {
+				return;
+			}
+
+			const removed = answer.pop();
+			const poolItem = pool.find(item => item.letter === removed && item.used);
+			if (poolItem) {
+				poolItem.used = false;
+			}
+
+			nextBtn.classList.remove('show');
+			renderLetters();
+			renderSlots();
+			clearFeedback();
+		}
+
+		function resetAnswer() {
+			answer = [];
+			pool.forEach(item => {
+				item.used = false;
+			});
+
+			nextBtn.classList.remove('show');
+			renderLetters();
+			renderSlots();
+			clearFeedback();
+		}
+
+		undoBtn.addEventListener('click', undoLetter);
+		resetBtn.addEventListener('click', resetAnswer);
+		nextBtn.addEventListener('click', () => {
+			const nextId = getNextQuestionId();
+			if (nextId) {
+				currentQuestionId = nextId;
+				renderQuestion();
+				return;
+			}
+
+			alert('🎉 Semua soal Level 3 selesai.');
+		});
+
+		renderQuestion();
+	</script>
+</body>
+</html>
