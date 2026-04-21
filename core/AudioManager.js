@@ -28,7 +28,7 @@ export async function initAudio() {
         html5: false // Wajib false agar menggunakan Web Audio API
       });
     } catch (e) {
-      console.error("Gagal load suara:", letter, e);
+      // console.error("Gagal load suara:", letter, e);
     }
   }
 }

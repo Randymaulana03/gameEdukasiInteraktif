@@ -93,14 +93,14 @@ for (let i = 0; i < 26; i += 1) {
   button.style.animationDelay = (0.03 * i).toFixed(2) + "s";
 
   button.addEventListener("click", () => {
-  console.log("Tombol diklik untuk huruf:", upper); // Tambahkan ini
+  // console.log("Tombol diklik untuk huruf:", upper); // Tambahkan ini
   button.classList.add("active");
 
   try {
     playLetterSound(upper);
-    console.log("Fungsi playLetterSound berhasil dipanggil");
+    // console.log("Fungsi playLetterSound berhasil dipanggil");
   } catch (err) {
-    console.error("Gagal memutar suara:", err);
+    // console.error("Gagal memutar suara:", err);
   }
 
   setTimeout(() => {
