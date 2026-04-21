@@ -1,4 +1,4 @@
-import { initAudio, playLetterSound } from "./core/AudioManager.js";
+import { initAudio, playLetterSound } from "core/AudioManager.js";
 import { checkWord } from "./core/WordValidator.js";
 import {
   startWord,
