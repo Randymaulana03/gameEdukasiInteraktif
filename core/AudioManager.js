@@ -12,24 +12,25 @@ function createSound(src) {
 }
 
 // initialize audio manager without preloading all sounds
-export function initAudio() {
-  // huruf A-Z
+export async function initAudio() {
   for (let letter in letters) {
-    sounds[letter] = new Howl({
-      src: [letters[letter]],
-      volume: 1.0,
-      preload: false,
-      html5: true
-    });
-  }
+    try {
+      // Kita ambil datanya sebagai 'blob' atau 'arraybuffer'
+      // Ini biasanya tidak memicu IDM karena dianggap request data biasa, bukan media
+      const response = await fetch(letters[letter]);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
 
-  // suara benar
-  correctSound = new Howl({
-    src: ['assets/audio/cat.mp3'],
-    volume: 1.0,
-    preload: true,
-    html5: true
-  });
+      sounds[letter] = new Howl({
+        src: [url],
+        format: ['mp3'],
+        preload: true,
+        html5: false // Wajib false agar menggunakan Web Audio API
+      });
+    } catch (e) {
+      console.error("Gagal load suara:", letter, e);
+    }
+  }
 }
 
 // play suara huruf
