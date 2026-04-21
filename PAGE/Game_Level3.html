@@ -426,7 +426,7 @@
 			targetImage.src = question.image;
 			targetImage.alt = question.label;
 			// questionInfo.textContent = `ID ${question.id} - ${question.label.toUpperCase()}`;
-			nextBtn.textContent = getNextQuestionId() ? 'Soal Berikutnya' : '✅ Selesai';
+			nextBtn.textContent = getNextQuestionId() ? 'Soal Berikutnya' : 'Selesai';
 			initialLetters = buildLevel3Letters(question.answer);
 
 			// ✅ isi langsung
@@ -492,7 +492,7 @@
 			const isCorrect = updateArrangement(currentOrder);
 
 			if (isCorrect) {
-				showFeedback(`✅ Benar! Kata: ${getCurrentWord()}`, 'ok');
+				showFeedback(`Benar! Kata: ${getCurrentWord()}`, 'ok');
 				showNotification(true);
 				nextBtn.classList.add('show');
 			}

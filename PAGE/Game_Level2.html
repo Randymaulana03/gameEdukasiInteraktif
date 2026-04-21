@@ -547,8 +547,8 @@
             currentWordDisplay.textContent = q.label.toUpperCase(); 
 
             nextBtn.textContent = getNextQuestionId()
-                ? "➡️ Soal Berikutnya"
-                : "✅ Level 3";
+                ? "Soal Berikutnya"
+                : "Level 3";
             regenerateCurrentMatrix();
             renderGridForQuestion();
             resetRoundState();
@@ -597,7 +597,7 @@
                     el.classList.add("correct");
 
 
-                    feedback.textContent = "✅ Benar!";
+                    feedback.textContent = "Benar!";
                     feedback.className = "feedback correct";
 
                     showNotification(true);
