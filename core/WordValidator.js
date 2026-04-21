@@ -1,25 +1,19 @@
-// Hardcode words list (tanpa import, langsung di sini)
-const VALID_WORDS = [
-  "CAT",
-  "DOG",
-  "BIRD",
-  "APPLE",
-  "ATAP"
-];
+import { words as baseWords } from '../data/words.js';
+import { wordsLevel2 } from './words_Level2.js';
+import { wordsLevel3 } from '../data/Word_Level3.js';
 
-console.log('[WordValidator.js] Initialized with words:', VALID_WORDS);
+const VALID_WORDS = new Set([
+  ...baseWords.map((word) => word.toUpperCase().trim()),
+  ...wordsLevel2.map((item) => item.answer.toUpperCase().trim()),
+  ...wordsLevel3.map((item) => item.answer.toUpperCase().trim())
+]);
 
 export function checkWord(input) {
   if (!input) {
-    console.log('[checkWord] Input kosong, return false');
     return false;
   }
   
   const upperInput = input.toUpperCase().trim();
-  const isValid = VALID_WORDS.includes(upperInput);
+  return VALID_WORDS.has(upperInput);
   
-  console.log(`[checkWord] Input: "${input}" → "${upperInput}" → isValid: ${isValid}`);
-  console.log(`[checkWord] Available words:`, VALID_WORDS);
-  
-  return isValid;
 }

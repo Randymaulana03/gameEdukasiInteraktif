@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,6 +75,10 @@
             grid-template-columns: repeat(4, minmax(80px, 1fr));
             gap: 12px;
         }
+        .notification-box.correct {
+			border-color: #0cb76a;
+			background: linear-gradient(150deg, #effff6 0%, #cbf8e1 100%);
+		}
 
         .letter {
             width: 100%;
@@ -88,7 +93,7 @@
             font-size: clamp(1.8rem, 4vw, 2.8rem);
             font-weight: 900;
             cursor: pointer;
-        
+
             transition: all 0.2s ease;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
@@ -111,9 +116,17 @@
         }
 
         @keyframes correctPulse {
-            0% { transform: scale(1.15); }
-            50% { transform: scale(1.22); }
-            100% { transform: scale(1.15); }
+            0% {
+                transform: scale(1.15);
+            }
+
+            50% {
+                transform: scale(1.22);
+            }
+
+            100% {
+                transform: scale(1.15);
+            }
         }
 
         .right-panel {
@@ -233,6 +246,7 @@
                 opacity: 0;
                 transform: translateY(14px) scale(0.98);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -240,77 +254,90 @@
         }
 
         /* ===== NOTIFICATION MODAL ===== */
-        .notification-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+		.notification-overlay {
+			position: fixed;
+			inset: 0;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			background: rgba(0, 0, 0, 0.5);
+			z-index: 1000;
+			opacity: 0;
+			transition: opacity 0.25s ease;
+		}
 
-        .notification-overlay.show {
-            display: flex;
-            opacity: 1;
-        }
+		.notification-overlay.show {
+			display: flex;
+			opacity: 1;
+		}
 
-        .notification-box {
-            background: white;
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            min-width: 300px;
-            max-width: 500px;
-            animation: notificationSlide 0.5s ease-out;
-        }
+		.notification-box {
+			width: min(460px, 90vw);
+			border-radius: 24px;
+			padding: 28px 22px;
+			text-align: center;
+			border: 4px solid transparent;
+			box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+			animation: notifyPop 0.38s ease-out;
+		}
 
-        .notification-box.correct {
-            border: 5px solid #00D4FF;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 255, 0.1));
-        }
+		.notification-box.correct {
+			border-color: #0cb76a;
+			background: linear-gradient(150deg, #effff6 0%, #cbf8e1 100%);
+		}
 
-        .notification-box.incorrect {
-            border: 5px solid #FF6B6B;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(238, 90, 111, 0.1));
-        }
+		.notification-box.incorrect {
+			border-color: #ff5c77;
+			background: linear-gradient(150deg, #fff1f4 0%, #ffd6de 100%);
+		}
 
-        .notification-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
+		.notification-icon {
+			font-size: clamp(2.2rem, 6vw, 3.1rem);
+			margin-bottom: 8px;
+		}
 
-        .notification-text {
-            font-size: clamp(1.4rem, 3vw, 2.2rem);
-            font-weight: 900;
-            letter-spacing: 1px;
-            line-height: 1.4;
-        }
+		.notification-text {
+			font-size: clamp(1.3rem, 3.8vw, 2rem);
+			font-weight: 900;
+			letter-spacing: 0.6px;
+		}
 
-        .notification-box.correct .notification-text {
-            color: #00aa00;
-        }
+		.notification-subtext {
+			margin-top: 8px;
+			font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+			font-weight: 700;
+			color: #6b2b00;
+		}
 
-        .notification-box.incorrect .notification-text {
-            color: #cc0000;
-        }
+		.notification-box.correct .notification-text {
+			color: #0a944f;
+		}
 
-        @keyframes notificationSlide {
-            from {
-                opacity: 0;
-                transform: scale(0.8) translateY(-40px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
+		.notification-box.incorrect .notification-text {
+			color: #c50037;
+		}
+
+		@keyframes popIn {
+			from {
+				opacity: 0;
+				transform: scale(0.97) translateY(14px);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
+
+		@keyframes notifyPop {
+			from {
+				opacity: 0;
+				transform: scale(0.88) translateY(-16px);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
 
         @media (max-width: 900px) {
             .game-content {
@@ -328,13 +355,14 @@
         }
     </style>
 </head>
+
 <body>
     <canvas id="lineCanvas"></canvas>
 
     <main class="game-container">
         <div class="game-header">
             <h1>Level 2 - Susun Kata</h1>
-            <div id="questionInfo" style="margin-top: 8px; font-weight: 800; color: #8b1010;"></div>
+            <!-- <div id="questionInfo" style="margin-top: 8px; font-weight: 800; color: #8b1010;"></div> -->
         </div>
 
         <div class="game-content">
@@ -345,27 +373,41 @@
 
             <div class="right-panel">
                 <div class="target-image">
-                    <img id="targetImage" src="../IMAGE/atap.jpg" alt="Atap" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                    <img id="targetImage" src="../IMAGE/atap.jpg" alt="Atap"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
                 </div>
                 <div class="current-word" id="currentWord">_</div>
                 <div class="controls">
-                    <button id="resetBtn">🔄 Reset</button>
-                    <button id="nextBtn">✅ Next</button>
+                    <button id="resetBtn">Reset</button>
+                    <button id="nextBtn">Next</button>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- ===== NOTIFICATION OVERLAY ===== -->
-    <div class="notification-overlay" id="notificationOverlay">
+    <!-- <div class="notification-overlay" id="notificationOverlay">
         <div class="notification-box" id="notificationBox">
             <div class="notification-icon" id="notificationIcon">✅</div>
             <div class="notification-text" id="notificationText">BENAR!</div>
         </div>
-    </div>
-
+    </div> -->
+    <div class="notification-overlay" id="notificationOverlay">
+		<div class="notification-box" id="notificationBox">
+			<div class="notification-icon" id="notificationIcon">✅</div>
+			<div class="notification-text" id="notificationText">BENAR!</div>
+			<div class="notification-subtext" id="notificationSubtext">Kata kamu sudah tepat</div>
+		</div>
+	</div>
     <script type="module">
-        import { wordsLevel2 as QUESTION_BANK, buildLevel2Matrix } from '../data/words_Level2.js';
+        // lvl 2
+        import {
+            wordsLevel2 as QUESTION_BANK,
+            buildLevel2Matrix,
+        } from "../core/words_Level2.js";
+        import { startWord, addLetter, resetWord, getCurrentString, checkCurrentWord } from "../core/WordBuilder.js";
+        import { playCorrectSound, playIncorrectSound } from "../core/AudioManager.js";
+
 
         let isDragging = false;
         let selected = [];
@@ -375,53 +417,48 @@
         let currentQuestionId = 1;
         let currentMatrix = [];
         let currentGridCols = 4;
+        window.playCorrectSound = playCorrectSound;
 
-        const grid = document.getElementById('grid');
-        const canvas = document.getElementById('lineCanvas');
-        const ctx = canvas.getContext('2d');
-        const currentWordDisplay = document.getElementById('currentWord');
-        const targetImage = document.getElementById('targetImage');
-        const questionInfo = document.getElementById('questionInfo');
-        const resetBtn = document.getElementById('resetBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const feedback = document.getElementById('feedback');
-        
+        const grid = document.getElementById("grid");
+        const canvas = document.getElementById("lineCanvas");
+        const ctx = canvas.getContext("2d");
+        const currentWordDisplay = document.getElementById("currentWord");
+        const targetImage = document.getElementById("targetImage");
+        // const questionInfo = document.getElementById("questionInfo");
+        const resetBtn = document.getElementById("resetBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const feedback = document.getElementById("feedback");
+
         // ===== NOTIFICATION ELEMENTS =====
-        const notificationOverlay = document.getElementById('notificationOverlay');
-        const notificationBox = document.getElementById('notificationBox');
-        const notificationIcon = document.getElementById('notificationIcon');
-        const notificationText = document.getElementById('notificationText');
+        const notificationOverlay = document.getElementById("notificationOverlay");
+        const notificationBox = document.getElementById("notificationBox");
+        const notificationIcon = document.getElementById("notificationIcon");
+        const notificationText = document.getElementById("notificationText");
 
         // ===== SHOW NOTIFICATION FUNCTION =====
         function showNotification(isCorrect) {
             if (isCorrect) {
+                // notificationBox.className = "notification-box correct";
+                // notificationIcon.textContent = "✅";
+                // notificationText.textContent = "BENAR!";
                 notificationBox.className = 'notification-box correct';
-                notificationIcon.textContent = '✅';
-                notificationText.textContent = 'BENAR!';
-                playAudio('../assets/audio/Benar.mp3.mpeg');
+				notificationIcon.textContent = '✅';
+				notificationText.textContent = 'BENAR!';
+				notificationSubtext.textContent = 'Kata yang kamu susun sudah tepat.';
+                
             } else {
-                notificationBox.className = 'notification-box incorrect';
-                notificationIcon.textContent = '❌';
-                notificationText.textContent = 'COBA LAGI!';
-                playAudio('../assets/audio/Salah.mp3.mpeg');
+                notificationBox.className = "notification-box incorrect";
+                notificationIcon.textContent = "❌";
+                notificationText.textContent = "COBA LAGI!";
+                
             }
 
-            notificationOverlay.classList.add('show');
+            notificationOverlay.classList.add("show");
 
             // Auto hide after 3 seconds
             setTimeout(() => {
-                notificationOverlay.classList.remove('show');
+                notificationOverlay.classList.remove("show");
             }, 3000);
-        }
-
-        // ===== PLAY AUDIO FUNCTION =====
-        function playAudio(audioPath) {
-            try {
-                const audio = new Audio(audioPath);
-                audio.play().catch(err => console.log('Audio play error:', err));
-            } catch (error) {
-                console.log('Audio error:', error);
-            }
         }
 
         // ===== SETUP CANVAS =====
@@ -430,20 +467,20 @@
             canvas.height = window.innerHeight;
         }
         resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener("resize", resizeCanvas);
 
         function createLetterButton(letter) {
-            const el = document.createElement('button');
-            el.className = 'letter';
+            const el = document.createElement("button");
+            el.className = "letter";
             el.dataset.letter = letter;
             el.textContent = letter;
-            el.type = 'button';
+            el.type = "button";
             attachLetterHandlers(el);
             return el;
         }
 
         function getQuestionById(id) {
-            return QUESTION_BANK.find(q => q.id === id);
+            return QUESTION_BANK.find((q) => q.id === id);
         }
 
         function flattenMatrix(matrix) {
@@ -458,10 +495,10 @@
         }
 
         function renderGridForQuestion() {
-            grid.innerHTML = '';
+            grid.innerHTML = "";
             grid.style.gridTemplateColumns = `repeat(${currentGridCols}, minmax(60px, 1fr))`;
             const layout = flattenMatrix(currentMatrix);
-            layout.forEach(letter => {
+            layout.forEach((letter) => {
                 grid.appendChild(createLetterButton(letter));
             });
         }
@@ -471,138 +508,133 @@
         }
 
         function getNextQuestionId() {
-            const sortedIds = QUESTION_BANK.map(q => q.id).sort((a, b) => a - b);
-            return sortedIds.find(id => id > currentQuestionId);
+            const sortedIds = QUESTION_BANK.map((q) => q.id).sort((a, b) => a - b);
+            return sortedIds.find((id) => id > currentQuestionId);
         }
 
         function resetRoundState() {
+            resetWord();
             isDragging = false;
             selected = [];
             selectedEls = [];
             lastEl = null;
             isWordCorrect = false;
 
-            document.querySelectorAll('.letter').forEach(el => {
-                el.classList.remove('active', 'correct');
+            document.querySelectorAll(".letter").forEach((el) => {
+                el.classList.remove("active", "correct");
             });
 
             clearCanvas();
-            canvas.classList.remove('show');
+            canvas.classList.remove("show");
             updateDisplay();
-            nextBtn.classList.remove('show');
+            nextBtn.classList.remove("show");
             clearFeedback();
         }
 
         function loadQuestionById(id) {
+            resetWord();
             currentQuestionId = id;
             const q = getCurrentQuestion();
             targetImage.src = q.image;
             targetImage.alt = q.label;
-            questionInfo.textContent = `ID ${q.id} - ${q.label.toUpperCase()}`;
-            nextBtn.textContent = getNextQuestionId() ? '➡️ Soal Berikutnya' : '✅ Level 3';
+            // questionInfo.textContent = `ID ${q.id} - ${q.label.toUpperCase()}`;
+            
+            // Tampilkan label soal di display kata saat awal loading
+            currentWordDisplay.textContent = q.label.toUpperCase(); 
+
+            nextBtn.textContent = getNextQuestionId()
+                ? "➡️ Soal Berikutnya"
+                : "✅ Level 3";
             regenerateCurrentMatrix();
             renderGridForQuestion();
             resetRoundState();
         }
-
-        // ===== SIMPLE CHECK WORD FUNCTION =====
-        function checkWord(word) {
-            const upperWord = word.toUpperCase().trim();
-            const isValid = upperWord === getCurrentQuestion().answer;
-            console.log('[checkWord]', word, '→', upperWord, '| target:', getCurrentQuestion().answer, '=', isValid);
-            return isValid;
-        }
-
         function attachLetterHandlers(el) {
             const letter = el.dataset.letter;
 
             // 🟢 START DRAG
-            el.addEventListener('mousedown', () => {
+            el.addEventListener("mousedown", () => {
                 isDragging = true;
-                selected = [letter];
+                // selected = [letter];
+                startWord(letter);
                 selectedEls = [el];
                 lastEl = el;
                 isWordCorrect = false;
 
-                el.classList.add('active');
-                canvas.classList.add('show');
+                el.classList.add("active");
+                canvas.classList.add("show");
 
                 updateDisplay();
                 clearFeedback();
-                
-                console.log('[START] Letter:', letter);
+
             });
 
             // 🟡 DRAG ENTER (mouseenter)
-            el.addEventListener('mouseenter', () => {
+            el.addEventListener("mouseenter", () => {
                 if (!isDragging) return;
 
-                // Cegah input huruf yang BERURUTAN (consecutive) saja
                 if (lastEl && lastEl.dataset.letter === letter) return;
 
-                selected.push(letter);
-                selectedEls.push(el);
-                
-                const currentWord = selected.join('');
-                console.log('[DRAG] Added:', letter, '→ Word:', currentWord);
+                const isCorrect = addLetter(letter);
 
-                // Draw line dari huruf sebelumnya ke huruf sekarang
+                selectedEls.push(el);
+
                 if (lastEl) {
                     drawLine(lastEl, el);
                 }
 
-                el.classList.add('active');
+                el.classList.add("active");
                 lastEl = el;
 
-                // Update display
                 updateDisplay();
-
-                // Check apakah benar
-                const isCorrect = checkWord(currentWord);
 
                 if (isCorrect) {
                     isWordCorrect = true;
-                    el.classList.add('correct');
-                    feedback.textContent = '✅ Benar!';
-                    feedback.className = 'feedback correct';
-                    console.log('✅ CORRECT WORD!');
+                    el.classList.add("correct");
+
+
+                    feedback.textContent = "✅ Benar!";
+                    feedback.className = "feedback correct";
+
                     showNotification(true);
+                    playCorrectSound();
+
                 }
             });
         }
 
-        // 🔴 END DRAG
-        document.addEventListener('mouseup', () => {
+        document.addEventListener("mouseup", () => {
             if (!isDragging) return;
 
             isDragging = false;
-            canvas.classList.remove('show');
+            canvas.classList.remove("show");
 
-            const finalWord = selected.join('');
-            console.log('[MOUSEUP] Word:', finalWord, 'IsCorrect:', isWordCorrect);
-
-            // Hapus highlight
-            document.querySelectorAll('.letter').forEach(el => {
-                el.classList.remove('active');
+            document.querySelectorAll(".letter").forEach((el) => {
+                el.classList.remove("active");
             });
 
-            // Jika benar, keep highlight correct & show next button
             if (isWordCorrect) {
-                selectedEls.forEach(el => {
-                    el.classList.add('correct');
+                // Jika benar, biarkan visual kata tetap ada (jangan panggil resetWord dulu)
+                selectedEls.forEach((el) => {
+                    el.classList.add("correct");
                 });
-                nextBtn.classList.add('show');
+                nextBtn.classList.add("show");
             } else {
-                // Jika salah, clear
-                selected = [];
+                // Jika salah, baru kita reset total
                 selectedEls = [];
                 lastEl = null;
                 clearCanvas();
+
+                // Panggil resetWord di sini agar core logic kosong kembali
+                resetWord();
                 updateDisplay();
-                feedback.textContent = '❌ Coba lagi';
-                feedback.className = 'feedback incorrect';
+
+                feedback.textContent = "❌ Coba lagi";
+                feedback.className = "feedback incorrect";
                 showNotification(false);
+                playIncorrectSound();
             }
+            // Hapus pemanggilan resetWord() yang ada di luar IF
         });
 
         // ===== UTILITIES =====
@@ -618,9 +650,9 @@
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = '#FFD700';
+            ctx.strokeStyle = "#FFD700";
             ctx.lineWidth = 5;
-            ctx.lineCap = 'round';
+            ctx.lineCap = "round";
             ctx.stroke();
         }
 
@@ -629,34 +661,42 @@
         }
 
         function updateDisplay() {
-            const word = selected.join('');
-            currentWordDisplay.textContent = word || '_';
+            // Ambil string kata yang sedang disusun, bukan hasil check (boolean)
+            const displayStr = getCurrentString(); 
+            const q = getCurrentQuestion();
+            
+            // Tampilkan kata yang sedang disusun, jika kosong tampilkan label awal
+            currentWordDisplay.textContent = displayStr || q.label.toUpperCase();
         }
 
         function clearFeedback() {
-            feedback.textContent = '';
-            feedback.className = 'feedback';
+            feedback.textContent = "";
+            feedback.className = "feedback";
         }
 
         // ===== RESET BUTTON =====
-        resetBtn.addEventListener('click', () => {
+        resetBtn.addEventListener("click", () => {
             regenerateCurrentMatrix();
             resetRoundState();
             renderGridForQuestion();
         });
 
         // ===== NEXT BUTTON =====
-        nextBtn.addEventListener('click', () => {
+        nextBtn.addEventListener("click", () => {
             const nextId = getNextQuestionId();
             if (nextId) {
                 loadQuestionById(nextId);
                 return;
             }
 
-            window.location.href = 'Level3.html';
+            window.location.href = "Level3.html";
         });
 
         loadQuestionById(1);
+
     </script>
+
 </body>
+
+
 </html>

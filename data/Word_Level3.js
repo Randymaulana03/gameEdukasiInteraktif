@@ -44,8 +44,5 @@ function shuffleLetters(chars) {
 
 export function buildLevel3Letters(answer) {
 	const letters = answer.toUpperCase().trim().split('');
-	while (letters.length < Math.max(answer.length, 8)) {
-		letters.push(FILLER_LETTERS[randomInt(FILLER_LETTERS.length)]);
-	}
 	return shuffleLetters(letters);
 }

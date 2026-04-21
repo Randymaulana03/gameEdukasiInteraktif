@@ -22,7 +22,6 @@ export function checkArrangement() {
   const isCorrect = checkWord(word);
 
   if (isCorrect && !isAlreadyCorrect) {
-    console.log(word, "✅ BENAR");
     playCorrectSound();
     isAlreadyCorrect = true;
   }

@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Game Level 3 - Rapikan Huruf</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 	<style>
 		:root {
 			--panel: rgba(255, 255, 255, 0.42);
@@ -67,12 +68,14 @@
 
 		.left,
 		.right {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
 			border-radius: 20px;
 			background: rgba(255, 255, 255, 0.16);
 			border: 2px solid rgba(255, 255, 255, 0.35);
 			padding: 18px;
 			display: flex;
-			flex-direction: column;
 			gap: 14px;
 		}
 
@@ -315,27 +318,19 @@
 
 		<section class="layout">
 			<div class="left">
-				<p class="hint">Klik huruf acak sampai membentuk nama gambar</p>
 				<div class="target-image">
 					<img src="../IMAGE/apel.jpg" alt="Gambar apel">
 				</div>
 			</div>
 
 			<div class="right">
-				<div class="answer" id="answerSlots">
-					<div class="slot">_</div>
-					<div class="slot">_</div>
-					<div class="slot">_</div>
-					<div class="slot">_</div>
-				</div>
-
 				<div class="letters" id="lettersContainer"></div>
 				<div class="feedback" id="feedback"></div>
 
 				<div class="controls">
-					<button class="btn btn-large" id="undoBtn" type="button">↩ Hapus 1</button>
-					<button class="btn btn-large" id="resetBtn" type="button">🔄 Reset</button>
-					<button class="btn btn-next" id="nextBtn" type="button">✅ Lanjut</button>
+					<!-- <button class="btn btn-large" id="undoBtn" type="button">Hapus 1</button> -->
+					<button class="btn btn-large" id="resetBtn" type="button">Reset</button>
+					<button class="btn btn-next" id="nextBtn" type="button">Lanjut</button>
 				</div>
 			</div>
 		</section>
@@ -351,11 +346,17 @@
 
 	<script type="module">
 		import { wordsLevel3 as QUESTION_BANK, buildLevel3Letters } from '../data/Word_Level3.js';
+		import {
+				setInitialLetters,
+				updateArrangement,
+				getCurrentWord
+			} from '../core/ArrangeManager.js';
+		import { playCorrectSound, playIncorrectSound } from '../core/AudioManager.js';
 
 		const lettersContainer = document.getElementById('lettersContainer');
-		const answerSlots = document.getElementById('answerSlots');
+		// const answerSlots = document.getElementById('answerSlots');
 		const feedback = document.getElementById('feedback');
-		const undoBtn = document.getElementById('undoBtn');
+		// const undoBtn = document.getElementById('undoBtn');
 		const resetBtn = document.getElementById('resetBtn');
 		const nextBtn = document.getElementById('nextBtn');
 		const targetImage = document.querySelector('.target-image img');
@@ -371,8 +372,9 @@
 		const notificationText = document.getElementById('notificationText');
 		const notificationSubtext = document.getElementById('notificationSubtext');
 
-		let pool = [];
-		let answer = [];
+		let currentOrder = [];
+		let initialLetters = [];
+		let lastOrder = null;
 		let notificationTimer = null;
 		let currentQuestionId = 1;
 
@@ -389,20 +391,6 @@
 			return sortedIds.find(id => id > currentQuestionId);
 		}
 
-		function playAudioCandidates(candidates, index = 0) {
-			if (index >= candidates.length) {
-				return;
-			}
-
-			const audio = new Audio(candidates[index]);
-			audio.addEventListener('error', () => {
-				playAudioCandidates(candidates, index + 1);
-			}, { once: true });
-
-			audio.play().catch(() => {
-				playAudioCandidates(candidates, index + 1);
-			});
-		}
 
 		function showNotification(isCorrect) {
 			if (isCorrect) {
@@ -410,19 +398,14 @@
 				notificationIcon.textContent = '✅';
 				notificationText.textContent = 'BENAR!';
 				notificationSubtext.textContent = 'Kata yang kamu susun sudah tepat.';
-				playAudioCandidates([
-					'../assets/audio/benar.mp3',
-					'../assets/audio/Benar.mp3.mpeg'
-				]);
+				playCorrectSound();
+				
 			} else {
 				notificationBox.className = 'notification-box incorrect';
 				notificationIcon.textContent = '❌';
 				notificationText.textContent = 'COBA LAGI!';
 				notificationSubtext.textContent = 'Urutan huruf masih belum sesuai.';
-				playAudioCandidates([
-					'../assets/audio/salah.mp3',
-					'../assets/audio/Salah.mp3.mpeg'
-				]);
+				playIncorrectSound();
 			}
 
 			notificationOverlay.classList.add('show');
@@ -440,46 +423,78 @@
 			const question = getCurrentQuestion();
 			targetImage.src = question.image;
 			targetImage.alt = question.label;
-			questionInfo.textContent = `ID ${question.id} - ${question.label.toUpperCase()}`;
-			nextBtn.textContent = getNextQuestionId() ? '➡️ Soal Berikutnya' : '✅ Selesai';
-			answerSlots.innerHTML = '';
-			for (let i = 0; i < question.answer.length; i += 1) {
-				const slot = document.createElement('div');
-				slot.className = 'slot';
-				slot.textContent = '_';
-				answerSlots.appendChild(slot);
-			}
-			pool = buildLevel3Letters(question.answer).map(letter => ({ letter, used: false }));
-			answer = [];
-			renderLetters();
-			renderSlots();
-			clearFeedback();
-			nextBtn.classList.remove('show');
-		}
+			// questionInfo.textContent = `ID ${question.id} - ${question.label.toUpperCase()}`;
+			nextBtn.textContent = getNextQuestionId() ? 'Soal Berikutnya' : '✅ Selesai';
+			initialLetters = buildLevel3Letters(question.answer);
 
-		function renderSlots() {
-			answerSlots.innerHTML = '';
-			for (let i = 0; i < getCurrentQuestion().answer.length; i += 1) {
-				const slot = document.createElement('div');
-				slot.className = 'slot';
-				slot.textContent = answer[i] || '_';
-				answerSlots.appendChild(slot);
-			}
+			// ✅ isi langsung
+			currentOrder = [...initialLetters];
+
+			setInitialLetters(currentOrder);
+
+			renderLetters();
 		}
 
 		function renderLetters() {
 			lettersContainer.innerHTML = '';
-			pool.forEach((item, idx) => {
+
+			currentOrder.forEach((letter, index) => {
 				const btn = document.createElement('button');
-				btn.className = `letter-btn${item.used ? ' used' : ''}`;
-				btn.type = 'button';
-				btn.textContent = item.letter;
-				btn.disabled = item.used;
-				btn.addEventListener('click', () => addLetter(idx));
+				btn.className = 'letter-btn';
+				btn.textContent = letter;
+				btn.draggable = true;
+
+				// 🟢 DRAG START
+				btn.addEventListener('dragstart', (e) => {
+					e.dataTransfer.setData('fromIndex', index);
+					// playLetterSound(letter);
+					btn.classList.add('dragging');
+				});
+
+				// 🔴 DRAG END
+				btn.addEventListener('dragend', () => {
+				btn.classList.remove('dragging');
+				});
+
+				// 🟡 DRAG OVER
+				btn.addEventListener('dragover', (e) => {
+				e.preventDefault();
+				});
+
+				// 🔵 DROP
+				btn.addEventListener('drop', (e) => {
+				e.preventDefault();
+
+				const fromIndex = Number(e.dataTransfer.getData('fromIndex'));
+				const toIndex = index;
+
+				swapLetters(fromIndex, toIndex);
+				});
+
 				lettersContainer.appendChild(btn);
 			});
-		}
+			}
 
+
+		function swapLetters(from, to) {
+			// simpan status sebelum perubahan untuk undo
+			lastOrder = [...currentOrder];
+
+			// tukar posisi
+			const temp = currentOrder[from];
+			currentOrder[from] = currentOrder[to];
+			currentOrder[to] = temp;
+
+			renderLetters();
+
+			const isCorrect = updateArrangement(currentOrder);
+
+			if (isCorrect) {
+				showFeedback(`✅ Benar! Kata: ${getCurrentWord()}`, 'ok');
+				showNotification(true);
+				nextBtn.classList.add('show');
+			}
+		}
 		function showFeedback(text, kind) {
 			feedback.textContent = text;
 			feedback.className = `feedback ${kind}`;
@@ -490,77 +505,28 @@
 			feedback.className = 'feedback';
 		}
 
-		function checkAnswer() {
-			const question = getCurrentQuestion();
-			if (answer.length < question.answer.length) {
-				return;
-			}
-
-			if (answer.join('') === question.answer) {
-				showFeedback(`✅ Benar! Kata yang kamu susun: ${question.answer}`, 'ok');
-				showNotification(true);
-				nextBtn.classList.add('show');
-			} else {
-				showFeedback('❌ Urutan huruf belum tepat, coba lagi.', 'bad');
-				showNotification(false);
-				nextBtn.classList.remove('show');
-			}
-		}
-
-		function addLetter(index) {
-			if (pool[index].used || answer.length >= getCurrentQuestion().answer.length) {
-				return;
-			}
-
-			pool[index].used = true;
-			answer.push(pool[index].letter);
-			renderLetters();
-			renderSlots();
-			clearFeedback();
-			checkAnswer();
-		}
-
-		function undoLetter() {
-			if (answer.length === 0) {
-				return;
-			}
-
-			const removed = answer.pop();
-			const poolItem = pool.find(item => item.letter === removed && item.used);
-			if (poolItem) {
-				poolItem.used = false;
-			}
-
-			nextBtn.classList.remove('show');
-			renderLetters();
-			renderSlots();
-			clearFeedback();
-		}
-
 		function resetAnswer() {
-			answer = [];
-			pool.forEach(item => {
-				item.used = false;
-			});
+			currentOrder = [...initialLetters];
+			lastOrder = null;
 
-			nextBtn.classList.remove('show');
+			setInitialLetters(currentOrder);
 			renderLetters();
-			renderSlots();
+
 			clearFeedback();
+			nextBtn.classList.remove('show');
 		}
 
-		undoBtn.addEventListener('click', undoLetter);
-		resetBtn.addEventListener('click', resetAnswer);
-		nextBtn.addEventListener('click', () => {
-			const nextId = getNextQuestionId();
-			if (nextId) {
-				currentQuestionId = nextId;
-				renderQuestion();
-				return;
-			}
-
-			alert('🎉 Semua soal Level 3 selesai.');
-		});
+		// undoBtn.addEventListener('click', () => {
+		// 	if (!lastOrder) {
+		// 		return;
+		// 	}
+		// 	currentOrder = [...lastOrder];
+		// 	lastOrder = null;
+		// 	setInitialLetters(currentOrder);
+		// 	renderLetters();
+		// 	clearFeedback();
+		// 	nextBtn.classList.remove('show');
+		// });
 
 		renderQuestion();
 	</script>
