@@ -85,7 +85,7 @@ export function playCorrectSound() {
 export function playIncorrectSound() {
     // Buat variabel local saja jika hanya dipakai sesekali
     const incorrect = new Howl({
-        src: ['../assets/audio/salah.mp3'], 
+        src: ['../assets/audio/Salah.mp3'], 
         volume: 0.2,
         preload: true
     });
