@@ -62,7 +62,7 @@ export function playCorrectSound() {
     // 1. Inisialisasi jika belum ada
     if (!correctSound) {
         correctSound = new Howl({
-            src: ['../assets/audio/benar.mp3.mpeg'],
+            src: ['../assets/audio/Benar.mp3.mpeg'],
             volume: 1.0,
             preload: true
         });
