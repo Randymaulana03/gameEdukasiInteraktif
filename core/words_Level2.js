@@ -1,9 +1,17 @@
 const FILLER_LETTERS = 'CEFGHIKLMNOPQRSTVWXYZ';
 
 const ORIENTATION_GROUPS = {
-	horizontal: [[0, 1], [0, -1]],
-	vertical: [[1, 0], [-1, 0]],
-	diagonal: [[1, 1], [-1, -1], [1, -1], [-1, 1]]
+	horizontal: [
+		[0, 1],   // kiri -> kanan
+		[0, -1]   // kanan -> kiri
+	],
+	vertical: [
+		[1, 0]    // atas -> bawah
+	],
+	diagonal: [
+		[1, 1],   // ↘
+		[1, -1]   // ↙
+	]
 };
 
 export const wordsLevel2 = [

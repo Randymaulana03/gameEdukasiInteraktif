@@ -13,6 +13,11 @@
     --panel-border: rgba(255, 255, 255, 0.65);
 }
  
+:root {
+    --panel: rgba(255, 255, 255, 0.4);
+    --panel-border: rgba(255, 255, 255, 0.65);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -22,105 +27,214 @@
 body {
     min-height: 100vh;
     font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.18)), url("../IMAGE/BG_level1.jpg");
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,0.12),
+            rgba(255,255,255,0.18)
+        ),
+        url("../IMAGE/BG_level1.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding: 10px;
+
+    padding: 20px;
+
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .game-wrap {
-    width: min(900px, 100%);
+    width: min(1400px, 95%);
+
     background: var(--panel);
     border: 2px solid var(--panel-border);
-    border-radius: 28px;
-    padding: 18px;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+    border-radius: 30px;
+
+    padding: 30px;
+
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+
+    box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+
     animation: fadeIn 0.7s ease-out;
 }
 
 .top-bar {
+    position: relative;
 
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
+
+    gap: 18px;
+    margin-bottom: 35px;
 }
 
-h1 {
+.home-btn {
+    position: absolute;
+    top: 5%;
+    right: 7%;
 
-    font-size: clamp(1.2rem, 2.4vw, 1.85rem);
-    color: #8b1010;
-    background: rgba(255, 255, 255, 0.66);
-    padding: 10px 16px;
+    text-decoration: none;
+
+    padding: 20px 20px;
+
     border-radius: 999px;
+
+    background: linear-gradient(
+        180deg,
+        #ffb347,
+        #ff8c00
+    );
+
+    color: white;
+    font-weight: 800;
+
+    box-shadow:
+        0 4px 0 #c96c00,
+        0 8px 14px rgba(0,0,0,0.15);
+}
+h1 {
+    font-size: clamp(2rem, 3vw, 3rem);
+
+    color: #8b1010;
+
+    background: rgba(255,255,255,0.78);
+
+    padding: 14px 28px;
+
+    border-radius: 999px;
+
+    text-align: center;
+
+    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
 }
 
 .status {
+    font-size: clamp(1rem, 2vw, 1.3rem);
 
-    font-size: clamp(0.9rem, 1.8vw, 1rem);
     color: #1d3f19;
-    background: rgba(240, 255, 240, 0.78);
-    padding: 8px 12px;
-    border-radius: 12px;
+
+    background: rgba(240,255,240,0.85);
+
+    padding: 12px 18px;
+
+    border-radius: 14px;
+
+    text-align: center;
 }
 
-.letters-grid { 
+.letters-grid {
     display: grid;
-    grid-template-columns: repeat(6, minmax(90px, 1fr));
-    gap: 14px;
+
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+
+    gap: 20px;
 }
 
 .letter-btn {
     border: none;
+
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: 999px;
+
+    border-radius: 50%;
+
     font-weight: 900;
-    font-size: clamp(2rem, 4vw, 3.1rem);
+
+    font-size: clamp(3rem, 6vw, 5rem);
+
     line-height: 1;
+
     cursor: pointer;
-    box-shadow: 0 7px 0 rgba(0, 0, 0, 0.15), 0 11px 17px rgba(0, 0, 0, 0.2);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+
+    box-shadow:
+        0 7px 0 rgba(0,0,0,0.15),
+        0 11px 17px rgba(0,0,0,0.2);
+
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        filter 0.15s ease;
+
     opacity: 0;
     transform: translateY(22px) scale(0.94);
+
     animation: popUp 0.4s ease-out forwards;
 }
 
 .letter-btn:hover {
     filter: brightness(1.06);
+
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.13), 0 16px 18px rgba(0, 0, 0, 0.2);
+
+    box-shadow:
+        0 10px 0 rgba(0,0,0,0.13),
+        0 16px 18px rgba(0,0,0,0.2);
 }
 
 .letter-btn:active,
 .letter-btn.active {
     transform: translateY(4px) scale(0.97);
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15), 0 8px 12px rgba(0, 0, 0, 0.18);
+
+    box-shadow:
+        0 2px 0 rgba(0,0,0,0.15),
+        0 8px 12px rgba(0,0,0,0.18);
 }
 
 .actions {
-    margin-top: 16px;
+    margin-top: 30px;
+
     display: flex;
     justify-content: center;
 }
 
 .back-link {
-
     text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.8);
-    color: #5c3900;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 16px 32px;
+
+    border-radius: 999px;
+
+    font-size: 1.2rem;
+    font-weight: 800;
+
+    color: white;
+
+    background: linear-gradient(
+        180deg,
+        #ffb347,
+        #ff8c00
+    );
+
+    box-shadow:
+        0 6px 0 #c96c00,
+        0 12px 18px rgba(0,0,0,0.2);
+
+    transition: all 0.15s ease;
 }
 
+.back-link:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 9px 0 #c96c00,
+        0 16px 22px rgba(0,0,0,0.22);
+}
+
+.back-link:active {
+    transform: translateY(4px);
+
+    box-shadow:
+        0 2px 0 #c96c00,
+        0 8px 12px rgba(0,0,0,0.2);
+}
 @keyframes popUp {
     from {
         opacity: 0;
@@ -145,31 +259,39 @@ h1 {
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
     .letters-grid {
-        grid-template-columns: repeat(5, minmax(78px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(5, 1fr);
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
+    .letters-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
     body {
         padding: 12px;
     }
 
     .game-wrap {
-        padding: 12px;
-        border-radius: 18px;
-    }
-
-    .top-bar {
-        flex-direction: column;
-        align-items: stretch;
+        padding: 18px;
+        border-radius: 20px;
     }
 
     .letters-grid {
-        grid-template-columns: repeat(4, minmax(64px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .status {
+        font-size: 0.95rem;
     }
 }
 	</style>
@@ -185,7 +307,7 @@ h1 {
 		<section class="letters-grid" id="lettersGrid"></section>
 
 		<div class="actions">
-			<a class="back-link" href="Dashboard.html">Kembali ke Dashboard</a>
+			<a class="home-btn" href="Dashboard.html">Kembali</a>
 		</div>
 	</main>
 	<script type="module" src="../main.js"></script>

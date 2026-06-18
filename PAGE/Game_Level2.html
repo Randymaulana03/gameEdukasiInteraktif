@@ -501,9 +501,16 @@
         function renderGridForQuestion() {
             grid.innerHTML = "";
             grid.style.gridTemplateColumns = `repeat(${currentGridCols}, minmax(60px, 1fr))`;
+
             const layout = flattenMatrix(currentMatrix);
-            layout.forEach((letter) => {
-                grid.appendChild(createLetterButton(letter));
+
+            layout.forEach((letter, index) => {
+                const btn = createLetterButton(letter);
+
+                btn.dataset.row = Math.floor(index / currentGridCols);
+                btn.dataset.col = index % currentGridCols;
+
+                grid.appendChild(btn);
             });
         }
 
@@ -556,11 +563,12 @@
         function attachLetterHandlers(el) {
             const letter = el.dataset.letter;
 
-            // 🟢 START DRAG
+            // START DRAG
             el.addEventListener("mousedown", () => {
                 isDragging = true;
-                // selected = [letter];
+
                 startWord(letter);
+
                 selectedEls = [el];
                 lastEl = el;
                 isWordCorrect = false;
@@ -570,14 +578,40 @@
 
                 updateDisplay();
                 clearFeedback();
-
             });
 
-            // 🟡 DRAG ENTER (mouseenter)
+            // DRAG ENTER
             el.addEventListener("mouseenter", () => {
                 if (!isDragging) return;
 
-                if (lastEl && lastEl.dataset.letter === letter) return;
+                // Jangan pilih kotak yang sama
+                if (lastEl === el) return;
+
+                // Validasi arah gerakan
+                if (lastEl) {
+                    const lastRow = parseInt(lastEl.dataset.row);
+                    const lastCol = parseInt(lastEl.dataset.col);
+
+                    const currentRow = parseInt(el.dataset.row);
+                    const currentCol = parseInt(el.dataset.col);
+
+                    const rowDiff = currentRow - lastRow;
+                    const colDiff = currentCol - lastCol;
+
+                    // HANYA BOLEH:
+                    // atas -> bawah
+                    // kiri -> kanan
+                    const validMove =
+                        (
+                            rowDiff === 0 && Math.abs(colDiff) === 1
+                        ) || (
+                            rowDiff === 1 && colDiff === 0
+                        ) || (
+                            rowDiff === 1 && Math.abs(colDiff) === 1
+                        );
+
+                    if (!validMove) return;
+                }
 
                 const isCorrect = addLetter(letter);
 
@@ -596,13 +630,11 @@
                     isWordCorrect = true;
                     el.classList.add("correct");
 
-
                     feedback.textContent = "Benar!";
                     feedback.className = "feedback correct";
 
                     showNotification(true);
                     playCorrectSound();
-
                 }
             });
         }
