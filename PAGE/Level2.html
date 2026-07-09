@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Level 2 - Susun Kata</title>
-	<link rel="preload" as="image" href="../IMAGE/BG_Level.jpg">
+  <link rel="preload" as="image" href="../IMAGE/BG_Level.jpg">
 
   <style>
     :root {
-      --pill: #e89cab;
-      --text-red: #b9171d;
-      --ray: #ff525a;
+      /* Warna disesuaikan dengan Dashboard Level 2 */
+      --pill: #ccff00;       /* Kuning neon */
+      --pill-shadow: #b2e000;/* Shadow 3D hijau kekuningan */
+      --text-blue: #00aaff;  /* Biru cerah khas Level 2 */
+      --ray: #ccff00;        /* Sinar matahari kuning neon */
     }
 
     * {
@@ -78,12 +80,13 @@
     .pill {
       border-radius: 999px;
       background: var(--pill);
-      color: var(--text-red);
+      color: var(--text-blue); /* Warna Biru Level 2 */
       font-weight: 900;
       text-transform: uppercase;
       text-align: center;
       line-height: 1;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+      /* Efek 3D Shadow tebal seperti dashboard */
+      box-shadow: 0 10px 0 var(--pill-shadow), 0 14px 24px rgba(0, 0, 0, 0.18);
       opacity: 0;
       transform: translateY(22px) scale(0.95);
       animation: fadeUp 0.65s ease-out forwards;
@@ -108,7 +111,7 @@
     }
 
     .hint {
-      margin-top: 8px;
+      margin-top: 15px; /* Tambah sedikit jarak karena ada shadow tebal */
       color: #ffffff;
       background: rgba(0, 0, 0, 0.25);
       border-radius: 999px;
@@ -142,20 +145,9 @@
     }
 
     @media (max-width: 640px) {
-      .stage {
-        gap: 14px;
-      }
-
-      .ray-wrap {
-        width: min(240px, 64vw);
-        height: 64px;
-      }
-
-      .ray span {
-        width: 62px;
-        height: 14px;
-      }
-
+      .stage { gap: 14px; }
+      .ray-wrap { width: min(240px, 64vw); height: 64px; }
+      .ray span { width: 62px; height: 14px; }
       .ray span:nth-child(1) { transform: translate(-74px, 14px) rotate(-28deg); }
       .ray span:nth-child(2) { transform: translate(-52px, -7px) rotate(-11deg); }
       .ray span:nth-child(3) { transform: translate(-12px, -21px) rotate(-2deg); }
@@ -167,10 +159,7 @@
   <main class="stage" aria-label="Transisi ke permainan level 2">
     <div class="ray-wrap" aria-hidden="true">
       <div class="ray">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+  
       </div>
     </div>
 

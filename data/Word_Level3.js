@@ -11,7 +11,7 @@ export const wordsLevel3 = [
 		id: 2,
 		label: 'Nanas',
 		answer: 'NANAS',
-		image: '../IMAGE/nanas.kpg.jpg'
+		image: '../IMAGE/nanas.jpg'
 	},
     {
 		id: 3,
@@ -24,9 +24,25 @@ export const wordsLevel3 = [
 		label: 'Semangka',
 		answer: 'SEMANGKA',
 		image: '../IMAGE/semangka.jpg'
+	},
+	{
+		id: 5,
+		label: 'Rambutan',
+		answer: 'RAMBUTAN',
+		image: '../IMAGE/rambutan.jpeg'
+	},
+	{
+		id: 6,
+		label: 'Melon',
+		answer: 'MELON',
+		image: '../IMAGE/melon.jpeg'
+	},
+{
+		id: 7,
+		label: 'Sirsak',
+		answer: 'SIRSAK',
+		image: '../IMAGE/sirsak.jpeg'
 	}
-    
-
 ];
 
 function randomInt(max) {

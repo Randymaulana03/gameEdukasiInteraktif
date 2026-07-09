@@ -3,15 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Dashboard Level - Game Edukasi</title>
+	<title>Game Edukasi Interaktif - Dashboard Level</title>
 	<link rel="preload" as="image" href="../IMAGE/BG_Level.jpg">
 	<style>
 		:root {
-			--pink: #ec9cab;
-			--green: #5db824;
-			--blue: #20b8f0;
-			--red: #ff0055;
-			--shadow: rgba(0, 0, 0, 0.25);
+    /* Warna latar tombol & efek */
+			--btn-bg: #ccff00;          /* Kuning neon / Lime bright */
+			--btn-shadow: #b2e000;      /* Shadow bawah tombol (efek 3D) */
+			
+			/* Warna teks per level */
+			--text-level-1: #4a0e78;    /* Ungu tua / Deep Purple */
+			--text-level-2: #00aaff;    /* Biru cerah / Cyan Blue */
+			--text-level-3: #cc0033;    /* Merah / Crimson */
+
+			--shadow: rgba(0, 0, 0, 0.15);
 		}
 
 		* {
@@ -62,7 +67,7 @@
 			height: 12px;
 			margin: 0 4px;
 			border-radius: 12px;
-			background: #f39498;
+			background: #ccff00;
 			transform-origin: center bottom;
 		}
 
@@ -73,41 +78,43 @@
 
 		.level-btn {
 			width: 100%;
-			max-width: 370px;
-			border: none;
-			border-radius: 50px;
-			padding: 20px 24px;
-			background: var(--pink);
-			box-shadow: 0 8px 0 rgba(200, 110, 126, 0.95), 0 14px 24px var(--shadow);
-			cursor: pointer;
-			text-transform: uppercase;
-			font-weight: 900;
-			letter-spacing: 2px;
-			font-size: clamp(2rem, 4.5vw, 3rem);
-			line-height: 1;
-			transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
-			opacity: 0;
-			transform: translateY(28px) scale(0.95);
-			animation: popUp 0.6s ease-out forwards;
-			touch-action: manipulation;
+    max-width: 370px;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 24px;
+    background: var(--btn-bg);
+    
+    /* Efek tombol tebal 3D sesuai desain UI Game */
+    box-shadow: 0 8px 0 var(--btn-shadow), 0 12px 20px var(--shadow);
+    
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 2px;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    line-height: 1;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+    opacity: 0;
+    transform: translateY(28px) scale(0.95);
+    animation: popUp 0.6s ease-out forwards;
+    touch-action: manipulation;
 		}
 
 		.level-btn:hover {
-			filter: brightness(1.03);
-			transform: translateY(-2px) scale(1.01);
-			box-shadow: 0 10px 0 rgba(200, 110, 126, 0.95), 0 18px 24px var(--shadow);
+			filter: brightness(1.05);
+    		transform: translateY(-2px) scale(1.01);
+    		box-shadow: 0 10px 0 var(--btn-shadow), 0 16px 22px var(--shadow);
 		}
 
 		.level-btn:active,
 		.level-btn.pressed {
 			transform: translateY(6px) scale(0.98);
-			box-shadow: 0 2px 0 rgba(200, 110, 126, 0.95), 0 8px 16px rgba(0, 0, 0, 0.22);
-			filter: saturate(1.1);
+    		box-shadow: 0 2px 0 var(--btn-shadow), 0 6px 12px rgba(0, 0, 0, 0.2);
 		}
 
-		.level-1 { color: var(--green); animation-delay: 0.3s; }
-		.level-2 { color: var(--blue); animation-delay: 0.45s; }
-		.level-3 { color: var(--red); animation-delay: 0.6s; }
+		.level-1 { color: var(--text-level-1); animation-delay: 0.3s; }
+		.level-2 { color: var(--text-level-2); animation-delay: 0.45s; }
+		.level-3 { color: var(--text-level-3); animation-delay: 0.6s; }
 
 		@keyframes popUp {
 			from {
@@ -150,7 +157,7 @@
 	<main class="overlay">
 		<section class="level-menu" aria-label="Pilih level permainan">
 			<div class="sun-rays" aria-hidden="true">
-				<span></span><span></span><span></span><span></span>
+				<!-- <span></span><span></span><span></span><span></span> -->
 			</div>
 
 			<button class="level-btn level-1" data-target="Level1.html">LEVEL 1</button>

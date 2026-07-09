@@ -1,536 +1,611 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Game Level 3 - Rapikan Huruf</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Level 3 - Rapikan Huruf</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-	<link rel="preload" as="image" href="../IMAGE/BG_level1.jpg">
-
-	<style>
-		:root {
-			--panel: rgba(255, 255, 255, 0.42);
-			--panel-border: rgba(255, 255, 255, 0.72);
-			--tile-base: #f3c24c;
-			--tile-text: #7f1c0f;
-			--ok: #00a34c;
-			--bad: #c50037;
-		}
-
-		* {
-			box-sizing: border-box;
-			margin: 0;
-			padding: 0;
-		}
-
-		body {
-			min-height: 100vh;
-			font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
-			background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.2)), url("../IMAGE/BG_level1.jpg");
-			background-size: cover;
-			background-position: center;
-			background-repeat: no-repeat;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			padding: 20px;
-		}
-
-		.game-shell {
-			width: min(1100px, 100%);
-			background: var(--panel);
-			border: 2px solid var(--panel-border);
-			border-radius: 28px;
-			padding: 24px;
-			backdrop-filter: blur(4px);
-			box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
-			animation: popIn 0.6s ease-out;
-		}
-
-		.header {
-			text-align: center;
-			margin-bottom: 20px;
-		}
-
-		.header h1 {
-			font-size: clamp(1.6rem, 3vw, 2.4rem);
-			color: #8b1010;
-			background: rgba(255, 255, 255, 0.68);
-			padding: 10px 18px;
-			border-radius: 999px;
-			display: inline-block;
-		}
-
-		.layout {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 24px;
-			align-items: stretch;
-		}
-
-		.left,
-		.right {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			border-radius: 20px;
-			background: rgba(255, 255, 255, 0.16);
-			border: 2px solid rgba(255, 255, 255, 0.35);
-			padding: 18px;
-			display: flex;
-			gap: 14px;
-		}
-
-		.hint {
-			text-align: center;
-			color: #6b2b00;
-			font-weight: 700;
-			font-size: clamp(1rem, 2vw, 1.2rem);
-		}
-
-		.target-image {
-			width: 100%;
-			max-width: 320px;
-			aspect-ratio: 1 / 1;
-			margin: 0 auto;
-			border-radius: 16px;
-			overflow: hidden;
-			border: 3px solid rgba(255, 255, 255, 0.9);
-			box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-			background: rgba(255, 255, 255, 0.3);
-		}
-
-		.target-image img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			display: block;
-		}
-
-		.answer {
-			min-height: 90px;
-			border-radius: 16px;
-			border: 2px dashed rgba(139, 16, 16, 0.6);
-			background: rgba(255, 255, 255, 0.6);
-			padding: 12px;
-			display: grid;
-			grid-template-columns: repeat(4, minmax(56px, 1fr));
-			gap: 10px;
-			align-items: center;
-		}
-
-		.slot {
-			aspect-ratio: 1;
-			border-radius: 12px;
-			border: 2px solid rgba(139, 16, 16, 0.25);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: clamp(1.5rem, 4vw, 2rem);
-			font-weight: 900;
-			color: #8b1010;
-			background: rgba(255, 255, 255, 0.7);
-		}
-
-		.letters {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(60px, 1fr));
-			gap: 10px;
-		}
-
-		.letter-btn {
-			border: none;
-			border-radius: 14px;
-			background: linear-gradient(135deg, var(--tile-base), #d89342);
-			color: var(--tile-text);
-			font-weight: 900;
-			font-size: clamp(1.4rem, 3vw, 2rem);
-			aspect-ratio: 1;
-			cursor: pointer;
-			box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-			transition: transform 0.15s ease, filter 0.15s ease;
-		}
-
-		.letter-btn:hover {
-			transform: translateY(-2px) scale(1.03);
-			filter: brightness(1.06);
-		}
-
-		.letter-btn.used {
-			opacity: 0.42;
-			cursor: not-allowed;
-			transform: none;
-		}
-
-		.feedback {
-			min-height: 30px;
-			text-align: center;
-			font-size: clamp(1rem, 2vw, 1.3rem);
-			font-weight: 800;
-		}
-
-		.feedback.ok {
-			color: var(--ok);
-		}
-
-		.feedback.bad {
-			color: var(--bad);
-		}
-
-		.controls {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-			justify-content: center;
-		}
-
-		.btn {
-			border: none;
-			border-radius: 12px;
-			padding: 11px 16px;
-			font-weight: 800;
-			cursor: pointer;
-			background: rgba(255, 255, 255, 0.84);
-			color: #64390c;
-			transition: transform 0.15s ease, filter 0.15s ease;
-		}
-
-		.btn-large {
-			padding: 16px 26px;
-			font-size: 1.05rem;
-		}
-
-		.btn:hover {
-			transform: translateY(-1px);
-			filter: brightness(1.04);
-		}
-
-		.btn-next {
-			display: none;
-			background: rgba(90, 190, 120, 0.95);
-			color: #fff;
-		}
-
-		.btn-next.show {
-			display: inline-block;
-		}
-
-		.notification-overlay {
-			position: fixed;
-			inset: 0;
-			display: none;
-			justify-content: center;
-			align-items: center;
-			background: rgba(0, 0, 0, 0.5);
-			z-index: 1000;
-			opacity: 0;
-			transition: opacity 0.25s ease;
-		}
-
-		.notification-overlay.show {
-			display: flex;
-			opacity: 1;
-		}
-
-		.notification-box {
-			width: min(460px, 90vw);
-			border-radius: 24px;
-			padding: 28px 22px;
-			text-align: center;
-			border: 4px solid transparent;
-			box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
-			animation: notifyPop 0.38s ease-out;
-		}
-
-		.notification-box.correct {
-			border-color: #0cb76a;
-			background: linear-gradient(150deg, #effff6 0%, #cbf8e1 100%);
-		}
-
-		.notification-box.incorrect {
-			border-color: #ff5c77;
-			background: linear-gradient(150deg, #fff1f4 0%, #ffd6de 100%);
-		}
-
-		.notification-icon {
-			font-size: clamp(2.2rem, 6vw, 3.1rem);
-			margin-bottom: 8px;
-		}
-
-		.notification-text {
-			font-size: clamp(1.3rem, 3.8vw, 2rem);
-			font-weight: 900;
-			letter-spacing: 0.6px;
-		}
-
-		.notification-subtext {
-			margin-top: 8px;
-			font-size: clamp(0.95rem, 2.6vw, 1.1rem);
-			font-weight: 700;
-			color: #6b2b00;
-		}
-
-		.notification-box.correct .notification-text {
-			color: #0a944f;
-		}
-
-		.notification-box.incorrect .notification-text {
-			color: #c50037;
-		}
-
-		@keyframes popIn {
-			from {
-				opacity: 0;
-				transform: scale(0.97) translateY(14px);
-			}
-			to {
-				opacity: 1;
-				transform: scale(1) translateY(0);
-			}
-		}
-
-		@keyframes notifyPop {
-			from {
-				opacity: 0;
-				transform: scale(0.88) translateY(-16px);
-			}
-			to {
-				opacity: 1;
-				transform: scale(1) translateY(0);
-			}
-		}
-
-		@media (max-width: 900px) {
-			.layout {
-				grid-template-columns: 1fr;
-			}
-
-			.letters,
-			.answer {
-				grid-template-columns: repeat(4, minmax(52px, 1fr));
-			}
-		}
-	</style>
-</head>
-<body>
-	<main class="game-shell">
-		<header class="header">
-			<h1>Level 3 - Rapikan Huruf</h1>
-		</header>
-
-		<section class="layout">
-			<div class="left">
-				<div class="target-image">
-					<img src="../IMAGE/apel.jpg" alt="Gambar apel">
-				</div>
-			</div>
-
-			<div class="right">
-				<div class="letters" id="lettersContainer"></div>
-				<div class="feedback" id="feedback"></div>
-
-				<div class="controls">
-					<!-- <button class="btn btn-large" id="undoBtn" type="button">Hapus 1</button> -->
-					<button class="btn btn-large" id="resetBtn" type="button">Reset</button>
-					<button class="btn btn-next" id="nextBtn" type="button">Lanjut</button>
-				</div>
-			</div>
-		</section>
-	</main>
-
-	<div class="notification-overlay" id="notificationOverlay">
-		<div class="notification-box" id="notificationBox">
-			<div class="notification-icon" id="notificationIcon">✅</div>
-			<div class="notification-text" id="notificationText">BENAR!</div>
-			<div class="notification-subtext" id="notificationSubtext">Kata kamu sudah tepat</div>
-		</div>
-	</div>
-
-	<script type="module">
-		import { wordsLevel3 as QUESTION_BANK, buildLevel3Letters } from '../data/Word_Level3.js';
-		import {
-				setInitialLetters,
-				updateArrangement,
-				getCurrentWord
-			} from '../core/ArrangeManager.js';
-		import { playCorrectSound, playIncorrectSound } from '../core/AudioManager.js';
-
-		const lettersContainer = document.getElementById('lettersContainer');
-		// const answerSlots = document.getElementById('answerSlots');
-		const feedback = document.getElementById('feedback');
-		// const undoBtn = document.getElementById('undoBtn');
-		const resetBtn = document.getElementById('resetBtn');
-		const nextBtn = document.getElementById('nextBtn');
-		const targetImage = document.querySelector('.target-image img');
-		const questionInfo = document.createElement('div');
-		questionInfo.id = 'questionInfo';
-		questionInfo.style.marginTop = '8px';
-		questionInfo.style.fontWeight = '800';
-		questionInfo.style.color = '#8b1010';
-		document.querySelector('.header').appendChild(questionInfo);
-		const notificationOverlay = document.getElementById('notificationOverlay');
-		const notificationBox = document.getElementById('notificationBox');
-		const notificationIcon = document.getElementById('notificationIcon');
-		const notificationText = document.getElementById('notificationText');
-		const notificationSubtext = document.getElementById('notificationSubtext');
-
-		let currentOrder = [];
-		let initialLetters = [];
-		let lastOrder = null;
-		let notificationTimer = null;
-		let currentQuestionId = 1;
-
-		function getQuestionById(id) {
-			return QUESTION_BANK.find(question => question.id === id);
-		}
-
-		function getCurrentQuestion() {
-			return getQuestionById(currentQuestionId);
-		}
-
-		function getNextQuestionId() {
-			const sortedIds = QUESTION_BANK.map(question => question.id).sort((a, b) => a - b);
-			return sortedIds.find(id => id > currentQuestionId);
-		}
-
-
-		function showNotification(isCorrect) {
-			if (isCorrect) {
-				notificationBox.className = 'notification-box correct';
-				notificationIcon.textContent = '✅';
-				notificationText.textContent = 'BENAR!';
-				notificationSubtext.textContent = 'Kata yang kamu susun sudah tepat.';
-				playCorrectSound();
-				
-			} else {
-				notificationBox.className = 'notification-box incorrect';
-				notificationIcon.textContent = '❌';
-				notificationText.textContent = 'COBA LAGI!';
-				notificationSubtext.textContent = 'Urutan huruf masih belum sesuai.';
-				playIncorrectSound();
-			}
-
-			notificationOverlay.classList.add('show');
-
-			if (notificationTimer) {
-				clearTimeout(notificationTimer);
-			}
-
-			notificationTimer = setTimeout(() => {
-				notificationOverlay.classList.remove('show');
-			}, 3000);
-		}
-
-		function renderQuestion() {
-			const question = getCurrentQuestion();
-			targetImage.src = question.image;
-			targetImage.alt = question.label;
-			// questionInfo.textContent = `ID ${question.id} - ${question.label.toUpperCase()}`;
-			nextBtn.textContent = getNextQuestionId() ? 'Soal Berikutnya' : 'Selesai';
-			initialLetters = buildLevel3Letters(question.answer);
-
-			// ✅ isi langsung
-			currentOrder = [...initialLetters];
-
-			setInitialLetters(currentOrder);
-
-			renderLetters();
-		}
-
-		function renderLetters() {
-			lettersContainer.innerHTML = '';
-
-			currentOrder.forEach((letter, index) => {
-				const btn = document.createElement('button');
-				btn.className = 'letter-btn';
-				btn.textContent = letter;
-				btn.draggable = true;
-
-				// 🟢 DRAG START
-				btn.addEventListener('dragstart', (e) => {
-					e.dataTransfer.setData('fromIndex', index);
-					// playLetterSound(letter);
-					btn.classList.add('dragging');
-				});
-
-				// 🔴 DRAG END
-				btn.addEventListener('dragend', () => {
-				btn.classList.remove('dragging');
-				});
-
-				// 🟡 DRAG OVER
-				btn.addEventListener('dragover', (e) => {
-				e.preventDefault();
-				});
-
-				// 🔵 DROP
-				btn.addEventListener('drop', (e) => {
-				e.preventDefault();
-
-				const fromIndex = Number(e.dataTransfer.getData('fromIndex'));
-				const toIndex = index;
-
-				swapLetters(fromIndex, toIndex);
-				});
-
-				lettersContainer.appendChild(btn);
-			});
-			}
-
-
-		function swapLetters(from, to) {
-			// simpan status sebelum perubahan untuk undo
-			lastOrder = [...currentOrder];
-
-			// tukar posisi
-			const temp = currentOrder[from];
-			currentOrder[from] = currentOrder[to];
-			currentOrder[to] = temp;
-
-			renderLetters();
-
-			const isCorrect = updateArrangement(currentOrder);
-
-			if (isCorrect) {
-				showFeedback(`Benar! Kata: ${getCurrentWord()}`, 'ok');
-				showNotification(true);
-				nextBtn.classList.add('show');
-			}
-		}
-		function showFeedback(text, kind) {
-			feedback.textContent = text;
-			feedback.className = `feedback ${kind}`;
-		}
-
-		function clearFeedback() {
-			feedback.textContent = '';
-			feedback.className = 'feedback';
-		}
-
-		function resetAnswer() {
-			currentOrder = [...initialLetters];
-			lastOrder = null;
-
-			setInitialLetters(currentOrder);
-			renderLetters();
-
-			clearFeedback();
-			nextBtn.classList.remove('show');
-		}
-
-		// undoBtn.addEventListener('click', () => {
-		// 	if (!lastOrder) {
-		// 		return;
-		// 	}
-		// 	currentOrder = [...lastOrder];
-		// 	lastOrder = null;
-		// 	setInitialLetters(currentOrder);
-		// 	renderLetters();
-		// 	clearFeedback();
-		// 	nextBtn.classList.remove('show');
-		// });
-
-		renderQuestion();
-	</script>
-</body>
+    <link rel="preload" as="image" href="../IMAGE/BG_level1.jpg" />
+
+    <style>
+      :root {
+        --panel: rgba(255, 255, 255, 0.42);
+        --panel-border: rgba(255, 255, 255, 0.72);
+        --tile-base: #f3c24c;
+        --tile-text: #7f1c0f;
+        --ok: #00a34c;
+        --bad: #c50037;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.2)),
+          url("../IMAGE/BG_level1.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .game-shell {
+        width: min(1100px, 100%);
+        background: var(--panel);
+        border: 2px solid var(--panel-border);
+        border-radius: 28px;
+        padding: 24px;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+        animation: popIn 0.6s ease-out;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        color: #8b1010;
+        background: rgba(255, 255, 255, 0.68);
+        padding: 10px 18px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .left,
+      .right {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        padding: 18px;
+        display: flex;
+        gap: 14px;
+      }
+
+      .hint {
+        text-align: center;
+        color: #6b2b00;
+        font-weight: 700;
+        font-size: clamp(1rem, 2vw, 1.2rem);
+      }
+
+      .target-image {
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .target-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .answer {
+        min-height: 90px;
+        border-radius: 16px;
+        border: 2px dashed rgba(139, 16, 16, 0.6);
+        background: rgba(255, 255, 255, 0.6);
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(56px, 1fr));
+        gap: 10px;
+        align-items: center;
+      }
+
+	  .success-video{
+            width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+            border-radius: 20px;
+            display: none;
+            margin: 0 auto;
+        }
+      .slot {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        border: 2px solid rgba(139, 16, 16, 0.25);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        font-weight: 900;
+        color: #8b1010;
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .letters {
+        display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap; /* Memaksa huruf tetap 1 baris, tidak turun ke bawah */
+		justify-content: center;
+		align-items: center;
+		gap: 8px;
+		width: 100%;
+      }
+
+      .letter-btn {
+        flex: 1 1 0; /* Semua kotak membagi lebar container secara merata */
+		min-width: 0; /* Memungkinkan kotak menyusut kecil saat kata panjang */
+		aspect-ratio: 1; /* Menjaga bentuknya tetap persegi presisi */
+		
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		
+		border: none;
+		border-radius: 14px;
+		background: linear-gradient(135deg, var(--tile-base), #d89342);
+		color: var(--tile-text);
+		font-weight: 900;
+		font-size: clamp(1rem, 2.5vw, 1.8rem); /* Font otomatis mengecil jika kotaknya mengecil */
+		cursor: pointer;
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+		transition: transform 0.15s ease, filter 0.15s ease;
+      }
+
+      .letter-btn:hover {
+        transform: translateY(-2px) scale(1.03);
+        filter: brightness(1.06);
+      }
+
+      .letter-btn.used {
+        opacity: 0.42;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .feedback {
+        min-height: 30px;
+        text-align: center;
+        font-size: clamp(1rem, 2vw, 1.3rem);
+        font-weight: 800;
+      }
+
+      .feedback.ok {
+        color: var(--ok);
+      }
+
+      .feedback.bad {
+        color: var(--bad);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 11px 16px;
+        font-weight: 800;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.84);
+        color: #64390c;
+        transition:
+          transform 0.15s ease,
+          filter 0.15s ease;
+      }
+
+      .btn-large {
+        padding: 16px 26px;
+        font-size: 1.05rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+      }
+
+      .btn-next {
+        display: none;
+        background: rgba(90, 190, 120, 0.95);
+        color: #fff;
+      }
+
+      .btn-next.show {
+        display: inline-block;
+      }
+
+      .notification-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7); /* Background overlay dibuat sedikit lebih gelap agar fokus */
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+      .notification-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+      .notification-box {
+            text-align: center;
+            border-radius: 32px;
+            padding: 30px;
+            animation: notifyPop 0.38s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* Menggunakan background kaca (glassmorphism) yang serasi dengan game-container */
+            background: rgba(255, 255, 255, 0.9); 
+            /* border: 4px solid rgba(255, 255, 255, 1); */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            /* Ukuran Box yang proporsional dan pas untuk membungkus video */
+            width: min(650px, 90vw); 
+        }
+
+      .notification-box.correct {
+            width: min(1100px, 90vw); /* Atur batas lebar maksimal video sesuai selera (misal: 300px - 400px) */
+			background: transparent;
+            border: none;
+            box-shadow: none;
+
+        }
+
+        /* Aturan Box saat Salah (Pop-up kecil proporsional) */
+        .notification-box.incorrect {
+            width: min(1200px, 90vw);
+            background: transparent;
+            /* border: none; */
+            box-shadow: none;
+            /* border-color: #0cb76a; */
+        }
+
+      .notification-icon {
+        font-size: clamp(2.2rem, 6vw, 3.1rem);
+        margin-bottom: 8px;
+      }
+
+       .notification-text {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-top: 16px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+      .notification-subtext {
+        margin-top: 8px;
+        font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+        font-weight: 700;
+        color: #6b2b00;
+      }
+
+      .notification-box.correct .notification-text {
+            color: #0088cc;
+        }
+
+        .notification-box.incorrect .notification-text {
+            color: #c50037;
+        }
+
+
+      /* @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.97) translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      } */
+
+      @keyframes notifyPop {
+            from { opacity: 0; transform: scale(0.88) translateY(-16px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .letters,
+        .answer {
+          grid-template-columns: repeat(4, minmax(52px, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="header">
+        <h1>Level 3 - Rapikan Huruf</h1>
+      </header>
+
+      <section class="layout">
+        <div class="left">
+          <div class="target-image">
+            <img src="../IMAGE/apel.jpg" alt="Gambar apel" />
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="letters" id="lettersContainer"></div>
+          <div class="feedback" id="feedback"></div>
+
+          <div class="controls">
+            <!-- <button class="btn btn-large" id="undoBtn" type="button">Hapus 1</button> -->
+            <button class="btn btn-large" id="resetBtn" type="button">
+              Reset
+            </button>
+            <button class="btn btn-next" id="nextBtn" type="button">
+              Lanjut
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="notification-overlay" id="notificationOverlay">
+    <div class="notification-box" id="notificationBox">
+        
+        <video id="successVideo" class="success-video" preload="auto" playsinline>
+            <source src="../assets/gift/benar.mp4" type="video/mp4">
+            <source src="../assets/gift/benar.webm" type="video/webm">
+        </video>
+
+        <audio id="successAudioCustom" preload="auto">
+            <source src="../assets/audio/benar-lv3.mpeg" type="audio/mpeg">
+        </audio>
+
+        <div class="notification-text" id="notificationText"></div>
+    </div>
+</div>
+
+
+    <script type="module">
+      import {
+        wordsLevel3 as QUESTION_BANK,
+        buildLevel3Letters,
+      } from "../data/Word_Level3.js";
+      import {
+        setInitialLetters,
+        updateArrangement,
+        getCurrentWord,
+      } from "../core/ArrangeManager.js";
+    //   import {
+    //     playCorrectSound,
+    //     playIncorrectSound,
+    //   } from "../core/AudioManager.js";
+
+      const lettersContainer = document.getElementById("lettersContainer");
+      const feedback = document.getElementById("feedback");
+      const resetBtn = document.getElementById("resetBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const targetImage = document.querySelector(".target-image img");
+
+      const questionInfo = document.createElement("div");
+      questionInfo.id = "questionInfo";
+      questionInfo.style.marginTop = "8px";
+      questionInfo.style.fontWeight = "800";
+      questionInfo.style.color = "#8b1010";
+      document.querySelector(".header").appendChild(questionInfo);
+
+      // ===== NOTIFICATION ELEMENTS =====
+        const notificationOverlay = document.getElementById("notificationOverlay");
+        const notificationBox = document.getElementById("notificationBox");
+        const notificationText = document.getElementById("notificationText");
+        const successVideo = document.getElementById("successVideo");
+
+      let currentOrder = [];
+      let initialLetters = [];
+      let lastOrder = null;
+      let notificationTimer = null;
+      let currentQuestionId = 1;
+
+      function getQuestionById(id) {
+        return QUESTION_BANK.find((question) => question.id === id);
+      }
+
+      function getCurrentQuestion() {
+        return getQuestionById(currentQuestionId);
+      }
+
+      function getNextQuestionId() {
+        const sortedIds = QUESTION_BANK.map((question) => question.id).sort(
+          (a, b) => a - b,
+        );
+        return sortedIds.find((id) => id > currentQuestionId);
+      }
+
+      const successAudioCustom = document.getElementById("successAudioCustom");
+
+function showNotification(isCorrect) {
+    // Stop semua video dan audio sebelum diputar
+    successVideo.pause();
+    successVideo.style.display = "none";
+   
+
+    successAudioCustom.pause();
+    successAudioCustom.currentTime = 0;
+
+    if (isCorrect) {
+        notificationBox.className = "notification-box correct";
+        successVideo.style.display = "block";
+
+        // Putar Video Animasi
+        successVideo.currentTime = 0;
+        successVideo.play().catch(e => console.log("Video error:", e));
+
+        // Putar Audio Suara Khusus Level 3 (benar-lv3.mpeg)
+        successAudioCustom.play().catch(e => console.log("Audio error:", e));
+
+        notificationText.textContent = "";
+    } else {
+        notificationBox.className = "notification-box incorrect";
+    }
+
+    notificationOverlay.classList.add("show");
+
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+    }
+
+    notificationTimer = setTimeout(() => {
+        notificationOverlay.classList.remove("show");
+        successVideo.pause();
+        successAudioCustom.pause();
+    }, 2500);
+}
+
+      function renderQuestion() {
+        const question = getCurrentQuestion();
+
+        if (!question) return;
+
+        targetImage.src = question.image;
+        targetImage.alt = question.label;
+
+        // Update teks tombol lanjut / selesai
+        const nextId = getNextQuestionId();
+        nextBtn.textContent = nextId ? "Soal Berikutnya" : "Selesai";
+
+        // Bersihkan feedback sebelumnya & sembunyikan tombol lanjut sampai benar
+        clearFeedback();
+        nextBtn.classList.remove("show");
+
+        // Buat dan acak huruf baru
+        initialLetters = buildLevel3Letters(question.answer);
+        currentOrder = [...initialLetters];
+
+        setInitialLetters(currentOrder);
+        renderLetters();
+      }
+
+      function renderLetters() {
+        lettersContainer.innerHTML = "";
+
+        currentOrder.forEach((letter, index) => {
+          const btn = document.createElement("button");
+          btn.className = "letter-btn";
+          btn.textContent = letter;
+          btn.draggable = true;
+
+          btn.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("fromIndex", index);
+            btn.classList.add("dragging");
+          });
+
+          btn.addEventListener("dragend", () => {
+            btn.classList.remove("dragging");
+          });
+
+          btn.addEventListener("dragover", (e) => {
+            e.preventDefault();
+          });
+
+          btn.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const fromIndex = Number(e.dataTransfer.getData("fromIndex"));
+            const toIndex = index;
+            swapLetters(fromIndex, toIndex);
+          });
+
+          lettersContainer.appendChild(btn);
+        });
+      }
+
+      function swapLetters(from, to) {
+        lastOrder = [...currentOrder];
+
+        const temp = currentOrder[from];
+        currentOrder[from] = currentOrder[to];
+        currentOrder[to] = temp;
+
+        renderLetters();
+
+        const isCorrect = updateArrangement(currentOrder);
+
+        if (isCorrect) {
+          showFeedback(`Benar! Kata: ${getCurrentWord()}`, "ok");
+          showNotification(true);
+          nextBtn.classList.add("show");
+        }
+      }
+
+      function showFeedback(text, kind) {
+        feedback.textContent = text;
+        feedback.className = `feedback ${kind}`;
+      }
+
+      function clearFeedback() {
+        feedback.textContent = "";
+        feedback.className = "feedback";
+      }
+
+      function resetAnswer() {
+        currentOrder = [...initialLetters];
+        lastOrder = null;
+
+        setInitialLetters(currentOrder);
+        renderLetters();
+
+        clearFeedback();
+        nextBtn.classList.remove("show");
+      }
+
+      // 🟢 PERBAIKAN 1: Event listener untuk tombol RESET
+      resetBtn.addEventListener("click", () => {
+        resetAnswer();
+      });
+
+      // 🟢 PERBAIKAN 2: Event listener untuk tombol LANJUT / SOAL BERIKUTNYA
+      nextBtn.addEventListener("click", () => {
+        const nextId = getNextQuestionId();
+        if (nextId) {
+          currentQuestionId = nextId; // Pindah ke ID berikutnya (misal: 2 = Nanas)
+          renderQuestion();
+        } else {
+          alert("Selamat! Kamu sudah menyelesaikan semua soal!");
+        }
+      });
+
+      // Jalankan game pertama kali
+      renderQuestion();
+    </script>
+  </body>
 </html>

@@ -8,10 +8,10 @@
 
   <style>
     :root {
-      --pill: #e89cab;
-      --text-red: #b9171d;
-      --ray: #ff525a;
-    }
+  --pill: #ccff00;       /* Kuning neon / Lime bright (sama seperti tombol) */
+  --text-purple: #4a0e78;/* Ungu tua khas Level 1 */
+  --ray: #ccff00;        /* Sinar matahari disamakan dengan warna pill */
+}
 
     * {
       box-sizing: border-box;
@@ -76,18 +76,18 @@
     .ray span:nth-child(4) { transform: translate(34px, -24px) rotate(9deg); width: 64px; }
 
     .pill {
-      border-radius: 999px;
-      background: var(--pill);
-      color: var(--text-red);
-      font-weight: 900;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
-      opacity: 0;
-      transform: translateY(22px) scale(0.95);
-      animation: fadeUp 0.65s ease-out forwards;
-    }
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--text-purple); /* Diubah dari var(--text-red) ke var(--text-purple) */
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  box-shadow: 0 10px 0 #b2e000, 0 14px 24px rgba(0, 0, 0, 0.18); /* Ditambahkan efek shadow 3D */
+  opacity: 0;
+  transform: translateY(22px) scale(0.95);
+  animation: fadeUp 0.65s ease-out forwards;
+}
 
     .pill.level {
       min-width: min(370px, 84vw);
@@ -167,10 +167,6 @@
   <main class="stage" aria-label="Transisi ke permainan level 1">
     <div class="ray-wrap" aria-hidden="true">
       <div class="ray">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
       </div>
     </div>
 

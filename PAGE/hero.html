@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Edukasi Interaktif</title>
+  <style>
+    /* 1. RESET DEFAULT MARGIN BROWSER */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden; /* Mencegah scrollbar horizontal muncul */
+    }
+
+    /* 2. KONTAINER HERO FULLSCREEN */
+    .hero-container {
+      position: relative;
+      width: 100vw;  /* Full lebar layar */
+      height: 100vh; /* Full tinggi layar */
+      overflow: hidden;
+    }
+
+    /* 3. GAMBAR HERO METODE OVERLAY */
+    .hero-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Kunci: Gambar tidak akan gepeng, menyesuaikan proporsi layar */
+      object-position: center; /* Fokus gambar tetap di tengah */
+      display: block;
+    }
+
+    /* 4. TOMBOL START DI ATAS HERO */
+    .start-button {
+      position: absolute;
+      
+      /* ATUR POSISI TOMBOL DI SINI */
+      top: 70%;  /* Atur jarak dari atas (misal: 60%) */
+      left: 50%; /* Atur jarak dari kiri (50% = tengah) */
+      transform: translate(-50%, -50%); /* Memastikan koordinat benar-benar tepat di tengah tombol */
+      
+      width: 250px; /* Ukuran lebar tombol (bisa ganti ke % atau px) */
+      max-width: 30vw; /* Agar tidak terlalu besar di layar HP */
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+      z-index: 10; /* Memastikan tombol selalu ada di lapisan paling atas */
+    }
+
+    .start-button:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+      filter: brightness(1.15);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero-container">
+    <!-- Gambar Hero Utama -->
+    <img src="/IMAGE/hero.jpeg" alt="Hero Image" class="hero-image">
+
+    <!-- Tombol Start menuju Dashboard -->
+    <a href="dashboard.html">
+      <img src="/IMAGE/start.jpg.jpeg" alt="Start Button" class="start-button">
+    </a>
+  </header>
+
+</body>
+</html>
