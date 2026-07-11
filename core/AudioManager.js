@@ -64,8 +64,11 @@ export function playCorrectSound() {
         correctSound = new Howl({
             src: ['../assets/audio/benar-lv3.mpeg'],
             volume: 1.0,
-            preload: true
+            sprite: {
+                potong: [0, 2500] // Memutar dari detik 0 selama 1500ms (1.5 detik)
+            }
         });
+        correctSound.play('potong');
     }
 
     // 2. Resume Context untuk browser
