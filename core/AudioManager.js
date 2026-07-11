@@ -64,6 +64,7 @@ export function playCorrectSound() {
         correctSound = new Howl({
             src: ['../assets/audio/benar-lv3.mpeg'],
             volume: 1.0,
+            preload: true,
             sprite: {
                 potong: [0, 2500] // Memutar dari detik 0 selama 1500ms (1.5 detik)
             }
@@ -82,7 +83,7 @@ export function playCorrectSound() {
         return; // Keluar dari fungsi, biarkan suara yang pertama selesai
     }
 
-    correctSound.play();
+    correctSound.play('potong');
 }
 
 export function playIncorrectSound() {
