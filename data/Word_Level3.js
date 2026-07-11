@@ -11,7 +11,7 @@ export const wordsLevel3 = [
 		id: 2,
 		label: 'Nanas',
 		answer: 'NANAS',
-		image: '../IMAGE/nanas.jpg'
+		image: '../IMAGE/nanas.jpeg'
 	},
     {
 		id: 3,
